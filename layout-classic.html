@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AppInApp – Layout B · Icon Rail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --primary:#65A694;--primary-dark:#47766C;--primary-light:#CCE0DC;
+      --bg:#F2F7F6;--surface:#ffffff;--border:#E6F0EE;
+      --text-900:#0C1312;--text-600:#3D5C57;--text-400:#83B4AA;
+      --rail-w:64px;--panel-w:220px;
+      --topbar-h:56px;
+      --radius-sm:6px;--radius-md:8px;--radius-lg:10px;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 8px 24px rgba(0,0,0,.12);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-900);display:flex;height:100vh;overflow:hidden}
+
+    /* ════════════════════════════════
+       ICON RAIL (leftmost column)
+    ════════════════════════════════ */
+    .rail{
+      width:var(--rail-w);background:var(--text-900);
+      display:flex;flex-direction:column;align-items:center;
+      padding:.75rem 0;gap:.25rem;z-index:300;flex-shrink:0;
+      overflow:visible;
+    }
+
+    .rail-brand{
+      width:38px;height:38px;background:var(--primary);border-radius:var(--radius-md);
+      display:flex;align-items:center;justify-content:center;
+      margin-bottom:.5rem;cursor:pointer;flex-shrink:0;
+    }
+    .rail-brand svg{color:#fff}
+
+    .rail-divider{width:32px;height:1px;background:rgba(255,255,255,.1);margin:.25rem 0}
+
+    /* rail app button */
+    .rail-item{
+      position:relative;width:44px;height:44px;border-radius:var(--radius-md);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;transition:background .15s;
+      color:rgba(255,255,255,.55);
+      flex-shrink:0;
+    }
+    .rail-item:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.9)}
+    .rail-item.active{background:rgba(101,166,148,.25);color:var(--primary-light)}
+    .rail-item svg{width:20px;height:20px}
+
+    /* badge on rail */
+    .rail-badge{
+      position:absolute;top:4px;right:4px;min-width:14px;height:14px;
+      background:#E8503D;border-radius:99px;border:2px solid var(--text-900);
+      display:flex;align-items:center;justify-content:center;
+      font-size:8px;color:#fff;font-weight:700;padding:0 2px;
+    }
+
+    /* tooltip on hover */
+    .rail-tooltip{
+      position:absolute;left:calc(var(--rail-w) + 6px);top:50%;transform:translateY(-50%);
+      background:var(--text-900);color:#fff;font-size:.75rem;font-weight:500;
+      padding:.3125rem .625rem;border-radius:var(--radius-sm);
+      white-space:nowrap;pointer-events:none;opacity:0;z-index:400;
+      box-shadow:var(--shadow-md);
+      transition:opacity .1s .05s;
+    }
+    .rail-item:hover .rail-tooltip{opacity:1}
+
+    /* rail bottom */
+    .rail-spacer{flex:1}
+    .rail-avatar{
+      width:32px;height:32px;border-radius:50%;background:var(--primary);
+      color:#fff;display:flex;align-items:center;justify-content:center;
+      font-size:.6875rem;font-weight:600;cursor:pointer;margin-top:.25rem;
+    }
+
+    /* ════════════════════════════════
+       CONTEXTUAL FLYOUT PANEL
+    ════════════════════════════════ */
+    .panel-wrap{
+      position:relative;z-index:200;
+      width:0;overflow:hidden;
+      transition:width .25s cubic-bezier(.4,0,.2,1);
+      flex-shrink:0;
+    }
+    .panel-wrap.open{width:var(--panel-w)}
+
+    .panel{
+      width:var(--panel-w);height:100vh;background:var(--surface);
+      border-right:1px solid var(--border);
+      display:flex;flex-direction:column;overflow-y:auto;
+      scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+    }
+    .panel::-webkit-scrollbar{width:4px}
+    .panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+    .panel-header{
+      padding:.875rem 1rem .625rem;
+      border-bottom:1px solid var(--border);
+      flex-shrink:0;
+    }
+    .panel-app-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem}
+    .panel-app-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .panel-app-name{font-size:.9375rem;font-weight:700;letter-spacing:-.01em}
+    .panel-branch{font-size:.75rem;color:var(--text-600)}
+
+    .panel-section{padding:.5rem 1rem .2rem;font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-400)}
+
+    .panel-item{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:.4375rem .875rem;border-radius:var(--radius-md);
+      text-decoration:none;color:var(--text-600);font-size:.875rem;font-weight:500;
+      cursor:pointer;transition:background .1s,color .1s;margin:1px .5rem;
+    }
+    .panel-item-left{display:flex;align-items:center;gap:.5rem}
+    .panel-item-left svg{width:15px;height:15px;opacity:.7;flex-shrink:0}
+    .panel-item:hover{background:var(--bg);color:var(--text-900)}
+    .panel-item.active{background:var(--primary-light);color:var(--primary-dark)}
+    .panel-item.active svg{opacity:1;color:var(--primary)}
+    .item-badge{background:#E8503D;color:#fff;font-size:.625rem;font-weight:700;padding:.125rem .375rem;border-radius:99px}
+
+    /* panel nested */
+    .panel-parent{display:flex;align-items:center;justify-content:space-between;padding:.4375rem .875rem;border-radius:var(--radius-md);color:var(--text-600);font-size:.875rem;font-weight:500;cursor:pointer;margin:1px .5rem;transition:background .1s}
+    .panel-parent:hover{background:var(--bg);color:var(--text-900)}
+    .panel-parent-left{display:flex;align-items:center;gap:.5rem}
+    .panel-parent-left svg{width:15px;height:15px;opacity:.7}
+    .pchevron{width:12px;height:12px;transition:transform .2s;opacity:.5}
+    .panel-parent.open .pchevron{transform:rotate(90deg)}
+    .panel-children{margin-left:1.875rem;max-height:0;overflow:hidden;transition:max-height .25s}
+    .panel-children.open{max-height:300px}
+    .panel-child{padding:.3125rem .5rem;border-radius:var(--radius-sm);font-size:.8125rem;color:var(--text-600);cursor:pointer;transition:background .1s,color .1s;margin:1px .25rem}
+    .panel-child:hover{background:var(--bg);color:var(--text-900)}
+    .panel-child.active{color:var(--primary-dark);font-weight:600}
+
+    .panel-divider{height:1px;background:var(--border);margin:.375rem .875rem}
+
+    .panel-footer{margin-top:auto;border-top:1px solid var(--border);padding:.625rem .75rem}
+    .panel-foot-item{display:flex;align-items:center;gap:.5rem;padding:.375rem .5rem;border-radius:var(--radius-sm);color:var(--text-600);font-size:.8125rem;cursor:pointer;transition:background .1s}
+    .panel-foot-item:hover{background:var(--bg);color:var(--text-900)}
+    .panel-foot-item svg{width:14px;height:14px}
+
+    /* ════════════════════════════════
+       MAIN AREA (topbar + content)
+    ════════════════════════════════ */
+    .main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+    .topbar{
+      height:var(--topbar-h);background:var(--surface);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 1.25rem;z-index:100;flex-shrink:0;gap:1rem;
+    }
+    .topbar-left{display:flex;align-items:center;gap:.75rem;min-width:0;overflow:hidden}
+
+    /* breadcrumb */
+    .breadcrumb{display:flex;align-items:center;gap:.375rem;font-size:.875rem;min-width:0;overflow:hidden}
+    .breadcrumb-seg{color:var(--text-600);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .breadcrumb-seg.active{color:var(--text-900);font-weight:600}
+    .bc-sep{opacity:.3;flex-shrink:0}
+
+    .divider-v{width:1px;height:20px;background:var(--border);flex-shrink:0}
+
+    .topbar-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+    .icon-btn{width:32px;height:32px;border-radius:var(--radius-md);border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-600);transition:background .15s}
+    .icon-btn:hover{background:var(--bg)}
+    .badge-wrap{position:relative}
+    .badge{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#E8503D;border-radius:50%;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700}
+
+    /* layout toggle */
+    .layout-toggle{display:flex;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:3px;gap:2px}
+    .layout-btn{display:flex;align-items:center;gap:.35rem;padding:.25rem .625rem;border-radius:99px;border:none;background:transparent;font-family:'Inter',sans-serif;font-size:.75rem;font-weight:500;color:var(--text-600);cursor:pointer;transition:background .15s,color .15s}
+    .layout-btn.active{background:var(--surface);color:var(--primary-dark);box-shadow:var(--shadow-sm)}
+
+    .ctx-chip{display:flex;align-items:center;gap:.375rem;font-size:.75rem;color:var(--text-600);padding:.25rem .5rem;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;background:transparent;border:none;font-family:'Inter',sans-serif;white-space:nowrap}
+    .ctx-chip:hover{background:var(--bg)}
+    .ctx-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0}
+
+    /* content */
+    .content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+    .page-header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-shrink:0}
+    .page-title{font-size:1.125rem;font-weight:700;letter-spacing:-.02em}
+    .page-sub{font-size:.8125rem;color:var(--text-600);margin-top:.125rem}
+    .page-actions{display:flex;align-items:center;gap:.5rem}
+    .btn{display:flex;align-items:center;gap:.4375rem;padding:.4375rem .875rem;border-radius:var(--radius-md);font-family:'Inter',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;border:none;transition:background .15s}
+    .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+    .btn-secondary{background:var(--bg);color:var(--text-600);border:1.5px solid var(--border)}.btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+    .btn svg{width:14px;height:14px}
+    .tab-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:flex-end;gap:0;flex-shrink:0}
+    .tab{padding:.625rem .8125rem;font-size:.875rem;font-weight:500;color:var(--text-600);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s}
+    .tab:hover{color:var(--text-900)}
+    .tab.active{color:var(--primary-dark);border-bottom-color:var(--primary)}
+    .tab-count{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:var(--primary);color:#fff;border-radius:50%;font-size:.6875rem;font-weight:700;margin-left:.4375rem}
+    .content-inner{padding:1.5rem;flex:1}
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.875rem;margin-bottom:1.25rem}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.125rem}
+    .stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+    .stat-label{font-size:.6875rem;font-weight:600;color:var(--text-600);text-transform:uppercase;letter-spacing:.06em}
+    .stat-icon-wrap{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+    .stat-icon-wrap svg{width:14px;height:14px}
+    .stat-value{font-size:1.375rem;font-weight:700;letter-spacing:-.03em}
+    .stat-sub{font-size:.75rem;color:var(--text-600);margin-top:.25rem}
+    .up{color:#10B981}.down{color:#E8503D}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+    .card-header{padding:.875rem 1.125rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .card-title{font-size:.9375rem;font-weight:600}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:.875rem}
+    thead th{text-align:left;padding:.5625rem .875rem;font-size:.6875rem;font-weight:600;color:var(--text-600);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+    tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:var(--bg)}
+    td{padding:.625rem .875rem;vertical-align:middle}
+    .order-id{font-weight:600;color:var(--primary-dark)}
+    .chip{display:inline-flex;align-items:center;padding:.1875rem .5rem;border-radius:99px;font-size:.6875rem;font-weight:600}
+    .chip-green{background:#d1fae5;color:#047857}.chip-yellow{background:#fef3c7;color:#d97706}.chip-blue{background:#dbeafe;color:#1d4ed8}.chip-red{background:#fee2e2;color:#b91c1c}.chip-gray{background:#f3f4f6;color:#374151}
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════ ICON RAIL ════════════════════ -->
+<nav class="rail" id="rail">
+  <!-- Brand -->
+  <div class="rail-brand" onclick="window.location.href='launcher.html'" title="Back to launcher">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+  </div>
+
+  <div class="rail-divider"></div>
+
+  <!-- App items — built by JS -->
+  <div id="railItems" style="display:contents"></div>
+
+  <div class="rail-spacer"></div>
+  <div class="rail-divider"></div>
+
+  <!-- Settings -->
+  <div class="rail-item" onclick="openPanel('settings')" id="rail-settings">
+    <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    <div class="rail-tooltip">Settings</div>
+  </div>
+
+  <div class="rail-avatar">JA</div>
+</nav>
+
+<!-- ════════════════════ PANEL (flyout) ════════════════════ -->
+<div class="panel-wrap" id="panelWrap">
+  <div class="panel" id="panel">
+    <!-- built by JS -->
+  </div>
+</div>
+
+<!-- ════════════════════ MAIN AREA ════════════════════ -->
+<div class="main-area">
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" id="breadcrumb">
+        <span class="breadcrumb-seg">Kilimani Grill</span>
+        <span class="bc-sep">›</span>
+        <span class="breadcrumb-seg">Orders</span>
+        <span class="bc-sep">›</span>
+        <span class="breadcrumb-seg active">Live Orders</span>
+      </nav>
+
+      <div class="divider-v"></div>
+
+      <button class="ctx-chip">
+        <div class="ctx-dot"></div>
+        Main Branch
+        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+      </button>
+    </div>
+
+    <div class="topbar-right">
+      <!-- Search -->
+      <button class="icon-btn" title="Search (⌘K)">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+      </button>
+
+      <!-- Layout toggle -->
+      <div class="layout-toggle">
+        <button class="layout-btn" id="btn-launcher" onclick="gotoLayout('launcher')">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+          A
+        </button>
+        <button class="layout-btn active" id="btn-classic" onclick="gotoLayout('classic')">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5M3.75 12h16.5m-16.5 6.75h16.5"/></svg>
+          B
+        </button>
+      </div>
+
+      <div class="divider-v"></div>
+
+      <div class="badge-wrap">
+        <button class="icon-btn">
+          <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+        </button>
+        <div class="badge">3</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="content" id="mainContent">
+    <!-- built by JS -->
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   Data (reuse same structure as layout A)
+═══════════════════════════════════════════════ */
+const apps = {
+  orders:{
+    name:'Orders',color:'#65A694',badge:'12',
+    railIcon:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>`,
+    nav:[
+      {label:'Dashboard',id:'dashboard'},
+      {label:'Live Orders',id:'live',badge:'12'},
+      {label:'Order History',id:'history'},
+      {label:'Temp Orders',id:'temp'},
+      {section:'Fulfilment'},
+      {label:'Kitchen Queue',id:'kitchen',badge:'4'},
+      {label:'Delivery Queue',id:'delivery-q',badge:'6'},
+      {label:'Completed',id:'completed'},
+    ]
+  },
+  menu:{
+    name:'Menu',color:'#f59e0b',badge:null,
+    railIcon:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>`,
+    nav:[
+      {label:'Overview',id:'menu-overview'},
+      {label:'Products',id:'products',children:[{label:'All Products',id:'all-products'},{label:'Categories',id:'categories'},{label:'Tags',id:'tags'}]},
+      {label:'Modifiers',id:'modifiers',children:[{label:'Modifier Groups',id:'mod-groups'},{label:'Modifier Types',id:'mod-types'}]},
+      {label:'Packaging',id:'packaging'},
+      {section:'Pricing'},
+      {label:'Charges & Fees',id:'charges'},
+      {label:'Pricing Rules',id:'pricing-rules'},
+    ]
+  },
+  reservations:{
+    name:'Reservations',color:'#8b5cf6',badge:'3',
+    railIcon:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5"/></svg>`,
+    nav:[
+      {label:'Reservations',id:'res-list'},{label:'Calendar',id:'res-calendar'},{label:'Board View',id:'res-board'},
+      {label:'Pre-Orders',id:'preorders',badge:'3'},{section:'Management'},{label:'Policies',id:'policies'},
+      {label:'Availability Blocks',id:'avail'},{label:'Parking',id:'parking'}
+    ]
+  },
+  pos:{
+    name:'POS',color:'#0ea5e9',badge:null,
+    railIcon:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25"/></svg>`,
+    nav:[
+      {label:'Overview',id:'pos-overview'},
+      {label:'HotelPlus',id:'hotelplus',children:[{label:'Sync Status',id:'pos-sync'},{label:'Transaction Logs',id:'pos-logs'},{label:'Configuration',id:'pos-config'}]},
+      {label:'Devices',id:'devices'},{section:'Reports'},{label:'Sales Reconciliation',id:'reconcile'},{label:'Discrepancies',id:'disc',badge:'2'}
+    ]
+  },
+  delivery:{
+    name:'Delivery',color:'#f97316',badge:'6',
+    railIcon:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25"/></svg>`,
+    nav:[{label:'Live Map',id:'live-map'},{label:'Active Dispatches',id:'dispatches',badge:'6'},{section:'Config'},{label:'Service Areas',id:'service-areas'},{label:'Delivery Pricing',id:'del-pricing'},{label:'Riders',id:'riders'},{label:'SafeBoda Gateway',id:'safeboda'}]
+  },
+  customers:{
+    name:'Customers',color:'#10b981',badge:'7',
+    railIcon:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>`,
+    nav:[{label:'All Customers',id:'cust-all'},{label:'Segments',id:'segments'},{label:'Loyalty Programme',id:'loyalty'},{section:'Communication'},{label:'Messages',id:'messages',badge:'7'},{label:'Message Centre',id:'msg-centre'},{section:'Ratings'},{label:'Reviews & Ratings',id:'ratings'}]
+  },
+  staff:{
+    name:'Staff',color:'#6366f1',badge:'5',
+    railIcon:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>`,
+    nav:[{label:'Staff Members',id:'staff-list'},{label:'Roles & Permissions',id:'roles'},{label:'Roster',id:'roster'},{section:'Tasks'},{label:'Tasks',id:'tasks',badge:'5'},{label:'Waiter Assignment',id:'waiter'}]
+  },
+  payments:{
+    name:'Payments',color:'#ec4899',badge:null,
+    railIcon:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>`,
+    nav:[{label:'Transactions',id:'txn'},{label:'Invoices',id:'invoices'},{label:'Revenue',id:'revenue'},{section:'Gateways'},{label:'M-Pesa',id:'mpesa'},{label:'PayStack',id:'paystack'},{label:'PesaPal',id:'pesapal'}]
+  },
+  settings:{
+    name:'Settings',color:'#94a3b8',badge:null,
+    railIcon:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`,
+    nav:[{label:'General',id:'s-general'},{label:'Branch Info',id:'s-branch'},{label:'Service Hours',id:'s-hours'},{label:'Integrations',id:'s-integrations'},{section:'Billing'},{label:'Subscription Plan',id:'s-plan'},{label:'Billing History',id:'s-billing'}]
+  }
+};
+
+let currentApp='orders';
+let activeNavId='live';
+let panelOpen=true;
+
+/* Build rail items */
+function buildRail(){
+  const ri=document.getElementById('railItems');
+  ri.innerHTML=Object.entries(apps).filter(([k])=>k!=='settings').map(([key,app])=>`
+    <div class="rail-item ${key===currentApp?'active':''}" id="rail-${key}" onclick="openPanel('${key}')">
+      ${app.railIcon}
+      ${app.badge?`<div class="rail-badge">${app.badge}</div>`:''}
+      <div class="rail-tooltip">${app.name}</div>
+    </div>
+  `).join('');
+}
+
+/* Build panel */
+function buildPanel(appKey){
+  const app=apps[appKey];
+  const panel=document.getElementById('panel');
+  let html=`
+    <div class="panel-header">
+      <div class="panel-app-row">
+        <div class="panel-app-dot" style="background:${app.color}"></div>
+        <div class="panel-app-name">${app.name}</div>
+      </div>
+      <div class="panel-branch">Kilimani Grill · Main</div>
+    </div>
+  `;
+
+  app.nav.forEach(item=>{
+    if(item.section){html+=`<div class="panel-section">${item.section}</div>`;return}
+    if(item.children){
+      const isOpen=item.children.some(c=>c.id===activeNavId)||item.id===activeNavId;
+      html+=`
+        <div class="panel-parent ${isOpen?'open':''}" onclick="togglePanelNav(this)">
+          <div class="panel-parent-left"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="15" height="15"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M3 12h18M3 18h18"/></svg>${item.label}</div>
+          <svg class="pchevron" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        </div>
+        <div class="panel-children ${isOpen?'open':''}">
+          ${item.children.map(c=>`<div class="panel-child ${c.id===activeNavId?'active':''}" onclick="setActive('${c.id}')">${c.label}</div>`).join('')}
+        </div>`;
+    } else {
+      html+=`
+        <div class="panel-item ${item.id===activeNavId?'active':''}" onclick="setActive('${item.id}')">
+          <div class="panel-item-left"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="15" height="15"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>${item.label}</div>
+          ${item.badge?`<span class="item-badge">${item.badge}</span>`:''}
+        </div>`;
+    }
+  });
+
+  html+=`
+    <div class="panel-footer">
+      <div class="panel-foot-item" onclick="window.location.href='launcher.html'">
+        <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+        All Apps
+      </div>
+    </div>
+  `;
+  panel.innerHTML=html;
+}
+
+/* content */
+function buildContent(appKey, navId){
+  const app=apps[appKey];
+  let pageLabel='Overview';
+  app.nav.forEach(n=>{
+    if(n.id===navId) pageLabel=n.label;
+    if(n.children) n.children.forEach(c=>{if(c.id===navId)pageLabel=c.label});
+  });
+
+  // update breadcrumb
+  document.getElementById('breadcrumb').innerHTML=`
+    <span class="breadcrumb-seg">Kilimani Grill</span>
+    <span class="bc-sep">›</span>
+    <span class="breadcrumb-seg">${app.name}</span>
+    <span class="bc-sep">›</span>
+    <span class="breadcrumb-seg active">${pageLabel}</span>
+  `;
+
+  document.getElementById('mainContent').innerHTML=`
+    <div class="page-header">
+      <div>
+        <div class="page-title">${pageLabel}</div>
+        <div class="page-sub">${app.name} · Kilimani Grill</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary">Filter</button>
+        <button class="btn btn-secondary">Export</button>
+        <button class="btn btn-primary">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          New
+        </button>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab active">All <span class="tab-count">147</span></div>
+      <div class="tab">Live <span class="tab-count" style="background:#E8503D">12</span></div>
+      <div class="tab">Completed</div>
+      <div class="tab">Cancelled</div>
+    </div>
+    <div class="content-inner">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-label">Revenue</div><div class="stat-icon-wrap" style="background:#E6F0EE;color:var(--primary)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div></div>
+          <div class="stat-value">KES 84,320</div><div class="stat-sub"><span class="up">↑ 12%</span> vs yesterday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-label">Orders</div><div class="stat-icon-wrap" style="background:#E6F0EE;color:var(--primary)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg></div></div>
+          <div class="stat-value">147</div><div class="stat-sub"><span class="up">↑ 8</span> this hour</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-label">Avg Value</div><div class="stat-icon-wrap" style="background:#fef3c7;color:#d97706"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5"/></svg></div></div>
+          <div class="stat-value">KES 573</div><div class="stat-sub"><span class="up">↑ 4%</span> vs last week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-label">Cancelled</div><div class="stat-icon-wrap" style="background:#fee2e2;color:#b91c1c"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div></div>
+          <div class="stat-value">4</div><div class="stat-sub"><span class="down">↑ 2</span> vs yesterday</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Orders</div>
+          <button class="btn btn-secondary" style="font-size:.8125rem;padding:.35rem .75rem">View All</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Type</th><th>Status</th><th>Time</th></tr></thead>
+            <tbody>
+              <tr><td><span class="order-id">#ORD-1042</span></td><td>Amina W.</td><td>3</td><td>KES 1,250</td><td><span class="chip chip-blue">Dine-in</span></td><td><span class="chip chip-yellow">Preparing</span></td><td>2m</td></tr>
+              <tr><td><span class="order-id">#ORD-1041</span></td><td>Brian K.</td><td>5</td><td>KES 2,800</td><td><span class="chip chip-gray">Delivery</span></td><td><span class="chip chip-yellow">On the way</span></td><td>8m</td></tr>
+              <tr><td><span class="order-id">#ORD-1040</span></td><td>Cynthia O.</td><td>2</td><td>KES 680</td><td><span class="chip chip-blue">Dine-in</span></td><td><span class="chip chip-green">Completed</span></td><td>14m</td></tr>
+              <tr><td><span class="order-id">#ORD-1039</span></td><td>Daniel M.</td><td>4</td><td>KES 1,920</td><td><span class="chip chip-gray">Takeaway</span></td><td><span class="chip chip-green">Completed</span></td><td>22m</td></tr>
+              <tr><td><span class="order-id">#ORD-1038</span></td><td>Eve N.</td><td>1</td><td>KES 450</td><td><span class="chip chip-gray">Delivery</span></td><td><span class="chip chip-red">Cancelled</span></td><td>35m</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── Interactions ── */
+function openPanel(appKey){
+  if(currentApp===appKey && panelOpen){
+    // toggle closed
+    panelOpen=false;
+    document.getElementById('panelWrap').classList.remove('open');
+    document.querySelectorAll('.rail-item').forEach(r=>r.classList.remove('active'));
+    return;
+  }
+  currentApp=appKey;
+  panelOpen=true;
+  activeNavId=apps[appKey]?.nav.find(n=>n.id)?.id||'dashboard';
+  document.getElementById('panelWrap').classList.add('open');
+  // update rail active
+  document.querySelectorAll('.rail-item').forEach(r=>{
+    r.classList.toggle('active',r.id==='rail-'+appKey||r.id==='rail-'+appKey+'-extra');
+  });
+  document.getElementById('rail-'+appKey)?.classList.add('active');
+  buildPanel(appKey);
+  buildContent(appKey,activeNavId);
+}
+
+function togglePanelNav(el){
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+}
+
+function setActive(navId){
+  activeNavId=navId;
+  buildPanel(currentApp);
+  buildContent(currentApp,navId);
+}
+
+function gotoLayout(mode){
+  if(mode==='launcher') window.location.href='layout-launcher.html';
+}
+
+/* Init */
+const stored=sessionStorage.getItem('activeApp');
+if(stored && apps[stored]) currentApp=stored;
+buildRail();
+openPanel(currentApp);
+</script>
+</body>
+</html>
