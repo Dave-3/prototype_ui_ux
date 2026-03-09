@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AppInApp – Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --primary:#65A694;--primary-dark:#47766C;--primary-light:#CCE0DC;
+      --bg:#F2F7F6;--surface:#fff;--border:#E6F0EE;
+      --text-900:#0C1312;--text-600:#3D5C57;--text-400:#83B4AA;
+      --sidebar-w:248px;--topnav-h:56px;
+      --radius-sm:6px;--radius-md:8px;--radius-lg:10px;--radius-xl:14px;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-900);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+    /* ═══ TOPNAV ═══ */
+    .topnav{
+      height:var(--topnav-h);background:var(--surface);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 1rem 0 .875rem;z-index:200;flex-shrink:0;gap:.5rem;
+    }
+    .topnav-left{display:flex;align-items:center;gap:.625rem;min-width:0;overflow:hidden}
+
+    .brand{display:flex;align-items:center;gap:.4375rem;text-decoration:none;color:inherit;flex-shrink:0}
+    .brand-icon{width:30px;height:30px;background:var(--primary);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center}
+    .brand-icon svg{color:#fff}
+    .brand-name{font-size:1rem;font-weight:700;letter-spacing:-.02em}
+    .brand-name em{font-style:normal;color:var(--primary)}
+
+    .divider-v{width:1px;height:20px;background:var(--border);flex-shrink:0}
+
+    /* biz label in topnav */
+    .biz-topnav-label{
+      display:flex;align-items:center;gap:.375rem;
+      padding:.25rem .625rem .25rem .4375rem;border-radius:99px;
+      background:var(--bg);border:1.5px solid var(--border);
+      font-size:.8125rem;font-weight:600;white-space:nowrap;flex-shrink:0;
+      cursor:pointer;transition:border-color .15s;
+    }
+    .biz-topnav-label:hover{border-color:var(--primary)}
+    .biz-topnav-label .dot{width:7px;height:7px;border-radius:50%}
+
+    /* module pills */
+    .module-switcher{display:flex;align-items:center;gap:2px;overflow-x:auto;scrollbar-width:none}
+    .module-switcher::-webkit-scrollbar{display:none}
+    .mod-pill{
+      display:flex;align-items:center;gap:.375rem;padding:.25rem .65rem;
+      border-radius:99px;border:none;background:transparent;
+      font-family:'Inter',sans-serif;font-size:.8rem;font-weight:500;
+      color:var(--text-600);cursor:pointer;white-space:nowrap;
+      transition:background .15s,color .15s;
+    }
+    .mod-pill:hover{background:var(--bg);color:var(--text-900)}
+    .mod-pill.active{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+    .mod-pill-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4}
+    .mod-pill.active .mod-pill-dot{opacity:1}
+
+    /* all-apps launcher btn */
+    .launcher-btn{
+      display:flex;align-items:center;gap:.375rem;padding:.25rem .625rem;
+      border-radius:99px;border:1.5px solid var(--border);background:transparent;
+      font-family:'Inter',sans-serif;font-size:.8rem;font-weight:500;
+      color:var(--text-600);cursor:pointer;white-space:nowrap;flex-shrink:0;
+      transition:border-color .15s,color .15s;
+    }
+    .launcher-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+    .topnav-right{display:flex;align-items:center;gap:.375rem;flex-shrink:0}
+    .icon-btn{width:32px;height:32px;border-radius:var(--radius-md);border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-600);transition:background .15s}
+    .icon-btn:hover{background:var(--bg)}
+    .badge-wrap{position:relative}
+    .badge{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#E8503D;border-radius:50%;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:700}
+    .avatar{width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;cursor:pointer}
+
+    /* ═══ BODY ═══ */
+    .body-wrap{display:flex;flex:1;overflow:hidden}
+
+    /* ─── SIDEBAR ─── */
+    .sidebar{
+      width:var(--sidebar-w);background:var(--surface);
+      border-right:1px solid var(--border);display:flex;flex-direction:column;
+      flex-shrink:0;overflow-y:auto;scrollbar-width:thin;
+      scrollbar-color:var(--border) transparent;position:relative;
+    }
+    .sidebar::-webkit-scrollbar{width:4px}
+    .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+    /* Context switcher */
+    .ctx-switcher{
+      border-bottom:1px solid var(--border);padding:.75rem;
+      background:var(--bg);position:relative;
+    }
+    .ctx-row-block{display:flex;flex-direction:column;gap:.375rem}
+    .ctx-select-btn{
+      display:flex;align-items:center;gap:.5rem;
+      padding:.4375rem .625rem;border-radius:var(--radius-md);
+      background:var(--surface);border:1.5px solid var(--border);
+      cursor:pointer;transition:border-color .15s;width:100%;text-align:left;
+      font-family:'Inter',sans-serif;
+    }
+    .ctx-select-btn:hover{border-color:var(--primary)}
+    .ctx-select-icon{width:20px;height:20px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ctx-select-label{flex:1;min-width:0}
+    .ctx-select-label-meta{font-size:.6875rem;color:var(--text-400);line-height:1}
+    .ctx-select-label-val{font-size:.8125rem;font-weight:600;color:var(--text-900);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ctx-chevron{color:var(--text-400);flex-shrink:0;transition:transform .2s}
+    .ctx-select-btn.open .ctx-chevron{transform:rotate(180deg)}
+
+    /* dropdown from ctx */
+    .ctx-dropdown{
+      position:absolute;left:.75rem;right:.75rem;z-index:100;
+      background:var(--surface);border:1.5px solid var(--border);
+      border-radius:var(--radius-lg);box-shadow:var(--shadow-md);
+      overflow:hidden;display:none;
+    }
+    .ctx-dropdown.open{display:block}
+    .ctx-dropdown-item{
+      display:flex;align-items:center;gap:.5rem;padding:.5625rem .75rem;
+      font-size:.8125rem;cursor:pointer;transition:background .12s;
+    }
+    .ctx-dropdown-item:hover{background:var(--bg)}
+    .ctx-dropdown-item.active{color:var(--primary-dark);background:var(--primary-light)}
+    .ctx-dropdown-item .check{width:14px;height:14px;margin-left:auto;color:var(--primary);visibility:hidden}
+    .ctx-dropdown-item.active .check{visibility:visible}
+    .ctx-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+    /* sidebar app header */
+    .sidebar-header{padding:.875rem 1rem .5rem;display:flex;align-items:center;gap:.5rem}
+    .sidebar-app-icon{width:28px;height:28px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sidebar-app-icon svg{width:14px;height:14px;color:#fff}
+    .sidebar-app-name{font-size:.9375rem;font-weight:700;letter-spacing:-.01em}
+
+    .sidebar-section{padding:.5rem 1rem .25rem;font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-400)}
+    .sidebar-divider{height:1px;background:var(--border);margin:.375rem .875rem}
+
+    .nav-item{
+      display:flex;align-items:center;gap:.5625rem;padding:.45rem .875rem;
+      border-radius:var(--radius-md);text-decoration:none;color:var(--text-600);
+      font-size:.875rem;font-weight:500;cursor:pointer;
+      transition:background .12s,color .12s;margin:1px .5rem;
+    }
+    .nav-item:hover{background:var(--bg);color:var(--text-900)}
+    .nav-item.active{background:var(--primary-light);color:var(--primary-dark)}
+    .nav-item.active svg{color:var(--primary)}
+    .nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.7}
+    .nav-item.active svg{opacity:1}
+    .nav-badge{margin-left:auto;background:#E8503D;color:#fff;font-size:.6875rem;font-weight:700;padding:.125rem .375rem;border-radius:99px}
+
+    .nav-parent{display:flex;align-items:center;gap:.5625rem;padding:.45rem .875rem;border-radius:var(--radius-md);text-decoration:none;color:var(--text-600);font-size:.875rem;font-weight:500;cursor:pointer;transition:background .12s,color .12s;margin:1px .5rem;justify-content:space-between}
+    .nav-parent:hover{background:var(--bg);color:var(--text-900)}
+    .nav-parent-left{display:flex;align-items:center;gap:.5625rem}
+    .nav-parent svg.icon{width:16px;height:16px;opacity:.7}
+    .nav-parent svg.chevron{width:12px;height:12px;transition:transform .2s;opacity:.5}
+    .nav-parent.open svg.chevron{transform:rotate(90deg)}
+    .nav-children{margin-left:2.25rem;overflow:hidden;max-height:0;transition:max-height .25s ease}
+    .nav-children.open{max-height:300px}
+    .nav-child{display:flex;align-items:center;gap:.4375rem;padding:.3125rem .5rem;border-radius:var(--radius-md);text-decoration:none;color:var(--text-600);font-size:.8125rem;cursor:pointer;transition:background .12s,color .12s;margin:1px .25rem}
+    .nav-child:hover{background:var(--bg);color:var(--text-900)}
+    .nav-child.active{color:var(--primary-dark);font-weight:600}
+
+    .sidebar-footer{margin-top:auto;border-top:1px solid var(--border);padding:.625rem}
+    .sidebar-footer-item{display:flex;align-items:center;gap:.5625rem;padding:.4rem .5rem;border-radius:var(--radius-md);color:var(--text-600);font-size:.8125rem;cursor:pointer;transition:background .12s;text-decoration:none}
+    .sidebar-footer-item:hover{background:var(--bg);color:var(--text-900)}
+    .sidebar-footer-item svg{width:15px;height:15px;flex-shrink:0}
+
+    /* ─── CONTENT ─── */
+    .content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+
+    .page-header{
+      background:var(--surface);border-bottom:1px solid var(--border);
+      padding:.875rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-shrink:0;
+    }
+    .page-title{font-size:1.0625rem;font-weight:700;letter-spacing:-.02em}
+    .page-breadcrumb{font-size:.75rem;color:var(--text-600);display:flex;align-items:center;gap:.3125rem;margin-top:.125rem;flex-wrap:wrap}
+    .bc-sep{opacity:.4}
+    .page-actions{display:flex;align-items:center;gap:.4375rem}
+    .btn{display:flex;align-items:center;gap:.375rem;padding:.4375rem .875rem;border-radius:var(--radius-md);font-family:'Inter',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;border:none;transition:background .15s}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .btn-secondary{background:var(--bg);color:var(--text-600);border:1.5px solid var(--border)}
+    .btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+    .btn svg{width:14px;height:14px}
+
+    .tab-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:flex-end;flex-shrink:0}
+    .tab{padding:.625rem .75rem;font-size:.875rem;font-weight:500;color:var(--text-600);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap}
+    .tab:hover{color:var(--text-900)}
+    .tab.active{color:var(--primary-dark);border-bottom-color:var(--primary)}
+    .tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;background:var(--primary);color:#fff;border-radius:99px;font-size:.6875rem;font-weight:700;margin-left:.3125rem}
+    .tab-count-red{background:#E8503D}
+
+    .content-inner{padding:1.25rem 1.5rem;flex:1}
+
+    /* Stats */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.875rem 1rem}
+    .stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.375rem}
+    .stat-label{font-size:.6875rem;font-weight:600;color:var(--text-600);text-transform:uppercase;letter-spacing:.06em}
+    .stat-icon-wrap{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+    .stat-icon-wrap svg{width:14px;height:14px}
+    .stat-value{font-size:1.3125rem;font-weight:700;letter-spacing:-.03em}
+    .stat-sub{font-size:.75rem;color:var(--text-600);margin-top:.125rem}
+    .up{color:#10B981}.down{color:#E8503D}
+
+    /* Table */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+    .card-header{padding:.75rem 1.125rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .card-title{font-size:.9375rem;font-weight:600}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:.875rem}
+    thead th{text-align:left;padding:.5625rem .875rem;font-size:.6875rem;font-weight:600;color:var(--text-600);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+    tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:var(--bg)}
+    td{padding:.625rem .875rem;vertical-align:middle}
+    .order-id{font-weight:600;color:var(--primary-dark)}
+    .chip{display:inline-flex;align-items:center;padding:.1875rem .5rem;border-radius:99px;font-size:.75rem;font-weight:600}
+    .chip-green{background:#d1fae5;color:#047857}
+    .chip-yellow{background:#fef3c7;color:#d97706}
+    .chip-blue{background:#dbeafe;color:#1d4ed8}
+    .chip-red{background:#fee2e2;color:#b91c1c}
+    .chip-gray{background:#f3f4f6;color:#374151}
+  </style>
+</head>
+<body>
+
+<!-- ═══ TOPNAV ═══ -->
+<header class="topnav">
+  <div class="topnav-left">
+    <a href="launcher.html" class="brand" title="Back to launcher">
+      <div class="brand-icon">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+      </div>
+      <span class="brand-name">App<em>In</em>App</span>
+    </a>
+
+    <div class="divider-v"></div>
+
+    <!-- Active business label -->
+    <div class="biz-topnav-label" id="bizTopLabel" onclick="goLauncher()">
+      <span class="dot" id="bizDot" style="background:var(--primary)"></span>
+      <span id="bizTopName">Kilimani Grill</span>
+      <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+    </div>
+
+    <div class="divider-v"></div>
+
+    <!-- Module pills (per business) -->
+    <nav class="module-switcher" id="moduleSwitcher">
+      <!-- built by JS -->
+    </nav>
+
+    <div class="divider-v"></div>
+
+    <button class="launcher-btn" onclick="goLauncher()">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+      All Businesses
+    </button>
+  </div>
+
+  <div class="topnav-right">
+    <button class="icon-btn" title="Global search">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+    </button>
+    <div class="badge-wrap">
+      <button class="icon-btn" title="Notifications">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+      </button>
+      <div class="badge">3</div>
+    </div>
+    <div class="divider-v"></div>
+    <div class="avatar">JO</div>
+  </div>
+</header>
+
+<!-- ═══ BODY ═══ -->
+<div class="body-wrap">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Context switcher (static in HTML, JS enhances) -->
+    <div class="ctx-switcher" id="ctxSwitcher">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Module nav header and items -->
+    <div id="sidebarNav">
+      <!-- filled by JS -->
+    </div>
+  </aside>
+
+  <!-- ─── CONTENT ─── -->
+  <div class="content" id="mainContent">
+    <!-- filled by JS -->
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   Business + module definitions
+════════════════════════════════════════════ */
+const businesses = {
+  restaurant: {
+    name:'Kilimani Grill', type:'Restaurant', color:'#65A694',
+    branches:['Kilimani Main','Westlands','Karen','CBD (Closed)'],
+    modules:['orders','menu','reservations','pos','delivery','customers','staff','payments']
+  },
+  car: {
+    name:'Nairobi Cabs', type:'Car Rental', color:'#0ea5e9',
+    branches:['JKIA Terminal','Upperhill Office'],
+    modules:['bookings','fleet','customers-car','payments-car']
+  },
+  logistics: {
+    name:'QuickShip Express', type:'Logistics', color:'#f97316',
+    branches:['Industrial Area Hub'],
+    modules:['dispatches','riders','tracking','payments-log']
+  },
+};
+
+const apps = {
+  orders:{
+    name:'Orders',label:'Orders',color:'#65A694',iconBg:'#E6F0EE',
+    nav:[
+      {label:'Dashboard',id:'dashboard',icon:'chart',badge:null},
+      {label:'Live Orders',id:'live',icon:'bolt',badge:'12'},
+      {label:'Order History',id:'history',icon:'clock',badge:null},
+      {label:'Temp Orders',id:'temp',icon:'clipboard',badge:null},
+      {section:'Fulfilment'},
+      {label:'Kitchen Queue',id:'kitchen',icon:'fire',badge:'4'},
+      {label:'Delivery Queue',id:'delivery-q',icon:'truck',badge:'6'},
+      {label:'Completed',id:'completed',icon:'check-circle',badge:null},
+      {section:'Settings'},
+      {label:'Order Settings',id:'ord-settings',icon:'cog',badge:null},
+    ]
+  },
+  menu:{
+    name:'Menu',label:'Menu',color:'#f59e0b',iconBg:'#fef3c7',
+    nav:[
+      {label:'Overview',id:'menu-overview',icon:'chart',badge:null},
+      {label:'Products',id:'products',icon:'tag',badge:null,
+        children:[{label:'All Products',id:'all-products'},{label:'Categories',id:'categories'},{label:'Tags',id:'tags'}]},
+      {label:'Modifiers',id:'modifiers',icon:'adjustments',badge:null,
+        children:[{label:'Modifier Groups',id:'mod-groups'},{label:'Modifier Types',id:'mod-types'}]},
+      {label:'Packaging',id:'packaging',icon:'box',badge:null},
+      {section:'Pricing'},
+      {label:'Charges & Fees',id:'charges',icon:'currency',badge:null},
+      {label:'Pricing Rules',id:'pricing-rules',icon:'sparkles',badge:null},
+    ]
+  },
+  reservations:{
+    name:'Reservations',label:'Reservations',color:'#8b5cf6',iconBg:'#ede9fe',
+    nav:[
+      {label:'Reservations',id:'res-list',icon:'list',badge:null},
+      {label:'Calendar',id:'res-calendar',icon:'calendar',badge:null},
+      {label:'Pre-Orders',id:'preorders',icon:'cart',badge:'3'},
+      {section:'Management'},
+      {label:'Availability Blocks',id:'avail',icon:'ban',badge:null},
+      {label:'Parking',id:'parking',icon:'car',badge:null},
+    ]
+  },
+  pos:{
+    name:'POS',label:'POS',color:'#0ea5e9',iconBg:'#e0f2fe',
+    nav:[
+      {label:'Overview',id:'pos-overview',icon:'chart',badge:null},
+      {label:'HotelPlus',id:'hotelplus',icon:'monitor',badge:null,
+        children:[{label:'Sync Status',id:'pos-sync'},{label:'Transaction Logs',id:'pos-logs'}]},
+      {label:'Devices',id:'devices',icon:'device',badge:null},
+      {section:'Reports'},
+      {label:'Reconciliation',id:'reconcile',icon:'balance',badge:null},
+      {label:'Discrepancies',id:'disc',icon:'warning',badge:'2'},
+    ]
+  },
+  delivery:{
+    name:'Delivery',label:'Delivery',color:'#f97316',iconBg:'#ffedd5',
+    nav:[
+      {label:'Live Map',id:'live-map',icon:'map',badge:null},
+      {label:'Active Dispatches',id:'dispatches',icon:'truck',badge:'6'},
+      {section:'Configuration'},
+      {label:'Service Areas',id:'service-areas',icon:'location',badge:null},
+      {label:'Delivery Pricing',id:'del-pricing',icon:'currency',badge:null},
+      {label:'Riders',id:'riders',icon:'person',badge:null},
+    ]
+  },
+  customers:{
+    name:'Customers',label:'Customers',color:'#10b981',iconBg:'#d1fae5',
+    nav:[
+      {label:'All Customers',id:'cust-all',icon:'users',badge:null},
+      {label:'Segments',id:'segments',icon:'filter',badge:null},
+      {label:'Loyalty Programme',id:'loyalty',icon:'star',badge:null},
+      {section:'Communication'},
+      {label:'Messages',id:'messages',icon:'chat',badge:'7'},
+      {label:'Reviews & Ratings',id:'ratings',icon:'star',badge:null},
+    ]
+  },
+  staff:{
+    name:'Staff',label:'Staff',color:'#6366f1',iconBg:'#e0e7ff',
+    nav:[
+      {label:'Staff Members',id:'staff-list',icon:'users',badge:null},
+      {label:'Roles & Permissions',id:'roles',icon:'shield',badge:null},
+      {label:'Roster',id:'roster',icon:'calendar',badge:null},
+      {section:'Tasks'},
+      {label:'Tasks',id:'tasks',icon:'check',badge:'5'},
+      {label:'Waiter Assignment',id:'waiter',icon:'person',badge:null},
+    ]
+  },
+  payments:{
+    name:'Payments',label:'Payments',color:'#ec4899',iconBg:'#fce7f3',
+    nav:[
+      {label:'Transactions',id:'txn',icon:'list',badge:null},
+      {label:'Invoices',id:'invoices',icon:'doc',badge:null},
+      {label:'Revenue',id:'revenue',icon:'chart',badge:null},
+      {section:'Gateways'},
+      {label:'M-Pesa',id:'mpesa',icon:'phone',badge:null},
+      {label:'PayStack',id:'paystack',icon:'card',badge:null},
+      {section:'Settings'},
+      {label:'Payment Settings',id:'pay-settings',icon:'cog',badge:null},
+    ]
+  },
+  /* Car Rental modules */
+  bookings:{
+    name:'Bookings',label:'Bookings',color:'#0ea5e9',iconBg:'#e0f2fe',
+    nav:[
+      {label:'All Bookings',id:'bk-all',icon:'list',badge:null},
+      {label:'Calendar',id:'bk-calendar',icon:'calendar',badge:null},
+      {label:'Active',id:'bk-active',icon:'bolt',badge:'8'},
+    ]
+  },
+  fleet:{
+    name:'Fleet',label:'Fleet',color:'#0ea5e9',iconBg:'#e0f2fe',
+    nav:[
+      {label:'All Vehicles',id:'veh-all',icon:'car',badge:null},
+      {label:'Availability',id:'veh-avail',icon:'check-circle',badge:null},
+      {label:'Maintenance',id:'veh-maint',icon:'cog',badge:'2'},
+    ]
+  },
+  'customers-car':{
+    name:'Customers',label:'Customers',color:'#0ea5e9',iconBg:'#e0f2fe',
+    nav:[{label:'All Customers',id:'cc-all',icon:'users',badge:null},{label:'Loyalty',id:'cc-loyalty',icon:'star',badge:null}]
+  },
+  'payments-car':{
+    name:'Payments',label:'Payments',color:'#0ea5e9',iconBg:'#e0f2fe',
+    nav:[{label:'Transactions',id:'pc-txn',icon:'list',badge:null},{label:'Invoices',id:'pc-inv',icon:'doc',badge:null}]
+  },
+  /* Logistics modules */
+  dispatches:{
+    name:'Dispatches',label:'Dispatches',color:'#f97316',iconBg:'#ffedd5',
+    nav:[
+      {label:'Active',id:'dp-active',icon:'bolt',badge:'6'},
+      {label:'All Dispatches',id:'dp-all',icon:'list',badge:null},
+      {label:'Tracking',id:'dp-track',icon:'map',badge:null},
+    ]
+  },
+  riders:{
+    name:'Riders',label:'Riders',color:'#f97316',iconBg:'#ffedd5',
+    nav:[{label:'All Riders',id:'rd-all',icon:'users',badge:null},{label:'On Duty',id:'rd-on',icon:'bolt',badge:'4'}]
+  },
+  tracking:{
+    name:'Tracking',label:'Tracking',color:'#f97316',iconBg:'#ffedd5',
+    nav:[{label:'Live Map',id:'tr-map',icon:'map',badge:null},{label:'History',id:'tr-hist',icon:'clock',badge:null}]
+  },
+  'payments-log':{
+    name:'Payments',label:'Payments',color:'#f97316',iconBg:'#ffedd5',
+    nav:[{label:'Transactions',id:'pl-txn',icon:'list',badge:null},{label:'Invoices',id:'pl-inv',icon:'doc',badge:null}]
+  },
+};
+
+/* ════════════════════════════════════════════
+   State
+════════════════════════════════════════════ */
+let currentBiz = 'restaurant';
+let currentBranch = 'Kilimani Main';
+let currentModule = 'orders';
+let activeNavId = 'live';
+
+/* ════════════════════════════════════════════
+   SVG icon helper
+════════════════════════════════════════════ */
+function icon(name,size=16){
+  const icons={
+    chart:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>`,
+    bolt:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>`,
+    clock:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    clipboard:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108"/></svg>`,
+    fire:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/></svg>`,
+    truck:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25"/></svg>`,
+    check:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    'check-circle':`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    cog:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`,
+    tag:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/></svg>`,
+    adjustments:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>`,
+    box:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>`,
+    currency:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    sparkles:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>`,
+    list:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>`,
+    calendar:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5"/></svg>`,
+    cart:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218"/></svg>`,
+    ban:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>`,
+    car:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25"/></svg>`,
+    map:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"/></svg>`,
+    location:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>`,
+    person:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>`,
+    users:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>`,
+    filter:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568"/></svg>`,
+    star:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>`,
+    chat:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>`,
+    shield:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>`,
+    monitor:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12"/></svg>`,
+    device:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>`,
+    balance:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352"/></svg>`,
+    warning:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>`,
+    doc:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>`,
+    phone:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>`,
+    card:`<svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="${size}" height="${size}"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>`,
+  };
+  return icons[name] || icons.list;
+}
+
+/* ════════════════════════════════════════════
+   Build context switcher
+════════════════════════════════════════════ */
+function buildContextSwitcher(){
+  const biz = businesses[currentBiz];
+  const el = document.getElementById('ctxSwitcher');
+
+  const bizOptionsHtml = Object.entries(businesses).map(([key,b])=>`
+    <div class="ctx-dropdown-item ${key===currentBiz?'active':''}" onclick="switchBiz('${key}');event.stopPropagation()">
+      <span class="ctx-dot" style="background:${b.color}"></span>
+      <div>
+        <div style="font-size:.8125rem;font-weight:600">${b.name}</div>
+        <div style="font-size:.6875rem;color:var(--text-400)">${b.type}</div>
+      </div>
+      <svg class="check" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+    </div>
+  `).join('');
+
+  const branchOptionsHtml = biz.branches.map(b=>`
+    <div class="ctx-dropdown-item ${b===currentBranch?'active':''}" onclick="switchBranch('${b}');event.stopPropagation()">
+      <span class="ctx-dot" style="background:${b.includes('Closed')?'#E8503D':'#10b981'}"></span>
+      ${b}
+      <svg class="check" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+    </div>
+  `).join('');
+
+  el.innerHTML = `
+    <div class="ctx-row-block">
+      <!-- Business selector -->
+      <button class="ctx-select-btn" id="bizSelBtn" onclick="toggleDrop('biz-drop')">
+        <div class="ctx-select-icon" style="background:${biz.color}20">
+          <svg fill="none" stroke="${biz.color}" stroke-width="2" viewBox="0 0 24 24" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+        </div>
+        <div class="ctx-select-label">
+          <div class="ctx-select-label-meta">Business</div>
+          <div class="ctx-select-label-val">${biz.name}</div>
+        </div>
+        <svg class="ctx-chevron" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+      </button>
+      <div class="ctx-dropdown" id="biz-drop" style="top:auto;margin-top:2px">${bizOptionsHtml}</div>
+
+      <!-- Branch selector -->
+      <button class="ctx-select-btn" id="branchSelBtn" onclick="toggleDrop('branch-drop')">
+        <div class="ctx-select-icon" style="background:#e8f5e9">
+          <svg fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+        </div>
+        <div class="ctx-select-label">
+          <div class="ctx-select-label-meta">Branch</div>
+          <div class="ctx-select-label-val">${currentBranch}</div>
+        </div>
+        <svg class="ctx-chevron" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+      </button>
+      <div class="ctx-dropdown" id="branch-drop" style="top:auto;margin-top:2px">${branchOptionsHtml}</div>
+    </div>
+  `;
+
+  // Update topnav label
+  document.getElementById('bizTopName').textContent = biz.name;
+  document.getElementById('bizDot').style.background = biz.color;
+}
+
+function toggleDrop(id){
+  const drop = document.getElementById(id);
+  const isOpen = drop.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.ctx-dropdown').forEach(d=>d.classList.remove('open'));
+  document.querySelectorAll('.ctx-select-btn').forEach(b=>b.classList.remove('open'));
+  if(!isOpen){
+    drop.classList.add('open');
+    drop.previousElementSibling.classList.add('open');
+  }
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', ()=>{
+  document.querySelectorAll('.ctx-dropdown').forEach(d=>d.classList.remove('open'));
+  document.querySelectorAll('.ctx-select-btn').forEach(b=>b.classList.remove('open'));
+});
+
+/* ════════════════════════════════════════════
+   Build module pills in topnav
+════════════════════════════════════════════ */
+function buildModulePills(){
+  const biz = businesses[currentBiz];
+  const sw = document.getElementById('moduleSwitcher');
+  sw.innerHTML = biz.modules.map(m=>{
+    const app = apps[m];
+    if(!app) return '';
+    return `<button class="mod-pill ${m===currentModule?'active':''}" data-mod="${m}" onclick="switchModule('${m}')">
+      <span class="mod-pill-dot"></span>${app.label}
+    </button>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════
+   Build sidebar nav
+════════════════════════════════════════════ */
+function buildSidebarNav(){
+  const app = apps[currentModule];
+  if(!app) return;
+  const el = document.getElementById('sidebarNav');
+  const biz = businesses[currentBiz];
+
+  let html = `
+    <div class="sidebar-header">
+      <div class="sidebar-app-icon" style="background:${app.color}">${icon(
+        currentModule==='orders'?'clipboard':
+        currentModule==='menu'?'tag':
+        currentModule==='staff'?'users':
+        currentModule==='payments'||currentModule==='payments-car'||currentModule==='payments-log'?'card':
+        currentModule==='delivery'?'truck':
+        currentModule==='customers'||currentModule==='customers-car'?'users':
+        currentModule==='reservations'?'calendar':
+        currentModule==='bookings'?'calendar':
+        currentModule==='fleet'?'car':
+        currentModule==='dispatches'?'bolt':
+        currentModule==='riders'?'users':
+        currentModule==='tracking'?'map':
+        'chart', 14)}</div>
+      <div class="sidebar-app-name">${app.name}</div>
+    </div>
+    <div class="sidebar-divider"></div>
+  `;
+
+  app.nav.forEach(item=>{
+    if(item.section){
+      html+=`<div class="sidebar-section">${item.section}</div>`;
+      return;
+    }
+    if(item.children){
+      const isOpen=item.children.some(c=>c.id===activeNavId);
+      html+=`<div class="nav-parent ${isOpen?'open':''}" onclick="toggleNav(this)">
+        <div class="nav-parent-left">${icon(item.icon)} ${item.label}</div>
+        <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      </div>
+      <div class="nav-children ${isOpen?'open':''}">
+        ${item.children.map(c=>`<div class="nav-child ${c.id===activeNavId?'active':''}" onclick="setActive('${c.id}')">${c.label}</div>`).join('')}
+      </div>`;
+    } else {
+      html+=`<div class="nav-item ${item.id===activeNavId?'active':''}" onclick="setActive('${item.id}')">
+        ${icon(item.icon)} ${item.label}
+        ${item.badge?`<span class="nav-badge">${item.badge}</span>`:''}
+      </div>`;
+    }
+  });
+
+  html+=`<div class="sidebar-footer">
+    <a href="launcher.html" class="sidebar-footer-item">
+      <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="15" height="15"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+      All Businesses
+    </a>
+    <div class="sidebar-footer-item">
+      <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="15" height="15"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Settings
+    </div>
+    <div class="sidebar-footer-item" style="color:#E8503D">
+      <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="15" height="15"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+      Sign Out
+    </div>
+  </div>`;
+  el.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════
+   Build content area
+════════════════════════════════════════════ */
+function buildContent(){
+  const app = apps[currentModule];
+  const biz = businesses[currentBiz];
+  let pageLabel = 'Dashboard';
+  app.nav.forEach(n=>{
+    if(n.id===activeNavId) pageLabel=n.label;
+    if(n.children) n.children.forEach(c=>{ if(c.id===activeNavId) pageLabel=c.label; });
+  });
+
+  const mc = document.getElementById('mainContent');
+  mc.innerHTML=`
+    <div class="page-header">
+      <div>
+        <div class="page-title">${pageLabel}</div>
+        <div class="page-breadcrumb">
+          <span>Johari Holdings</span>
+          <span class="bc-sep">›</span>
+          <span>${biz.name}</span>
+          <span class="bc-sep">›</span>
+          <span>${currentBranch}</span>
+          <span class="bc-sep">›</span>
+          <span style="color:var(--text-900)">${app.name} · ${pageLabel}</span>
+        </div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary" style="font-size:.8125rem;padding:.375rem .75rem">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5"/></svg>
+          Filter
+        </button>
+        <button class="btn btn-secondary" style="font-size:.8125rem;padding:.375rem .75rem">Export</button>
+        <button class="btn btn-primary" style="font-size:.8125rem">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          New
+        </button>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active">All <span class="tab-count">147</span></div>
+      <div class="tab">Live <span class="tab-count tab-count-red">12</span></div>
+      <div class="tab">Completed</div>
+      <div class="tab">Cancelled</div>
+    </div>
+
+    <div class="content-inner">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-label">Total Revenue</div><div class="stat-icon-wrap" style="background:#E6F0EE;color:var(--primary)">${icon('currency',14)}</div></div>
+          <div class="stat-value">KES 84,320</div>
+          <div class="stat-sub"><span class="up">↑ 12%</span> vs yesterday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-label">Volume</div><div class="stat-icon-wrap" style="background:#E6F0EE;color:var(--primary)">${icon('list',14)}</div></div>
+          <div class="stat-value">147</div>
+          <div class="stat-sub"><span class="up">↑ 8</span> this hour</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-label">Avg Value</div><div class="stat-icon-wrap" style="background:#fef3c7;color:#d97706">${icon('chart',14)}</div></div>
+          <div class="stat-value">KES 573</div>
+          <div class="stat-sub"><span class="up">↑ 4%</span> this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-label">Issues</div><div class="stat-icon-wrap" style="background:#fee2e2;color:#b91c1c">${icon('warning',14)}</div></div>
+          <div class="stat-value">4</div>
+          <div class="stat-sub"><span class="down">↑ 2</span> vs yesterday</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent — ${currentBranch}</div>
+          <button class="btn btn-secondary" style="font-size:.8125rem;padding:.3125rem .625rem">View All</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Ref</th><th>Customer</th><th>Items</th><th>Total</th><th>Type</th><th>Status</th><th>Time</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="order-id">#ORD-1042</span></td><td>Amina W.</td><td>3 items</td><td>KES 1,250</td><td><span class="chip chip-blue">Dine-in</span></td><td><span class="chip chip-yellow">Preparing</span></td><td>2m ago</td></tr>
+              <tr><td><span class="order-id">#ORD-1041</span></td><td>Brian K.</td><td>5 items</td><td>KES 2,800</td><td><span class="chip chip-gray">Delivery</span></td><td><span class="chip chip-yellow">On the way</span></td><td>8m ago</td></tr>
+              <tr><td><span class="order-id">#ORD-1040</span></td><td>Cynthia O.</td><td>2 items</td><td>KES 680</td><td><span class="chip chip-blue">Dine-in</span></td><td><span class="chip chip-green">Completed</span></td><td>14m ago</td></tr>
+              <tr><td><span class="order-id">#ORD-1039</span></td><td>Daniel M.</td><td>4 items</td><td>KES 1,920</td><td><span class="chip chip-gray">Takeaway</span></td><td><span class="chip chip-green">Completed</span></td><td>22m ago</td></tr>
+              <tr><td><span class="order-id">#ORD-1038</span></td><td>Eve N.</td><td>1 item</td><td>KES 450</td><td><span class="chip chip-gray">Delivery</span></td><td><span class="chip chip-red">Cancelled</span></td><td>35m ago</td></tr>
+              <tr><td><span class="order-id">#ORD-1037</span></td><td>Frank O.</td><td>6 items</td><td>KES 3,100</td><td><span class="chip chip-blue">Dine-in</span></td><td><span class="chip chip-green">Completed</span></td><td>48m ago</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ════════════════════════════════════════════
+   Interactions
+════════════════════════════════════════════ */
+function toggleNav(el){
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+}
+
+function setActive(navId){
+  activeNavId=navId;
+  buildSidebarNav();
+  buildContent();
+}
+
+function switchModule(mod){
+  currentModule=mod;
+  activeNavId=apps[mod]?.nav?.find(n=>n.id)?.id||'dashboard';
+  buildModulePills();
+  buildSidebarNav();
+  buildContent();
+}
+
+function switchBiz(bizKey){
+  currentBiz=bizKey;
+  currentBranch=businesses[bizKey].branches[0];
+  currentModule=businesses[bizKey].modules[0];
+  activeNavId=apps[currentModule]?.nav?.find(n=>n.id)?.id||'dashboard';
+  buildContextSwitcher();
+  buildModulePills();
+  buildSidebarNav();
+  buildContent();
+}
+
+function switchBranch(branch){
+  currentBranch=branch;
+  buildContextSwitcher();
+  buildContent();
+}
+
+function goLauncher(){
+  window.location.href='launcher.html';
+}
+
+/* ════════════════════════════════════════════
+   Init from sessionStorage or defaults
+════════════════════════════════════════════ */
+const storedMod = sessionStorage.getItem('activeApp');
+const storedBiz = sessionStorage.getItem('activeBiz');
+const storedBranch = sessionStorage.getItem('activeBranch');
+if(storedBiz && businesses[storedBiz]) {
+  currentBiz=storedBiz;
+  currentBranch=businesses[storedBiz].branches[0];
+}
+if(storedBranch) currentBranch=storedBranch;
+if(storedMod && apps[storedMod]) {
+  currentModule=storedMod;
+  activeNavId=apps[storedMod].nav.find(n=>n.id)?.id||'dashboard';
+} else {
+  currentModule=businesses[currentBiz].modules[0];
+  activeNavId=apps[currentModule]?.nav?.find(n=>n.id)?.id||'dashboard';
+}
+
+buildContextSwitcher();
+buildModulePills();
+buildSidebarNav();
+buildContent();
+</script>
+</body>
+</html>

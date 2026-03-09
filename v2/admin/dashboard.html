@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AppInApp Admin – Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --primary:#65A694;--primary-dark:#47766C;--primary-light:#CCE0DC;
+      --bg:#F2F7F6;--surface:#fff;--border:#E6F0EE;
+      --text-900:#0C1312;--text-600:#3D5C57;--text-400:#83B4AA;
+      --admin:#DC2626;--admin-bg:#FEF2F2;--admin-border:#FECACA;
+      --warn:#D97706;--warn-bg:#FFFBEB;--warn-border:#FDE68A;
+      --sidebar-w:232px;--topnav-h:56px;
+      --radius-sm:6px;--radius-md:8px;--radius-lg:10px;--radius-xl:14px;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#F4F5F7;color:var(--text-900);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+    /* ═══ TOPNAV ═══ */
+    .topnav{height:var(--topnav-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1rem 0 .875rem;z-index:200;flex-shrink:0;gap:.5rem}
+    .topnav-left{display:flex;align-items:center;gap:.625rem;min-width:0}
+    .brand{display:flex;align-items:center;gap:.4375rem;text-decoration:none;color:inherit;flex-shrink:0}
+    .brand-icon{width:30px;height:30px;background:var(--primary);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center}
+    .brand-icon svg{color:#fff}
+    .brand-name{font-size:1rem;font-weight:700;letter-spacing:-.02em}
+    .brand-name em{font-style:normal;color:var(--primary)}
+    .divider-v{width:1px;height:20px;background:var(--border);flex-shrink:0}
+    .admin-badge{display:flex;align-items:center;gap:.375rem;padding:.25rem .625rem;background:var(--admin-bg);border:1.5px solid var(--admin-border);border-radius:99px;color:var(--admin);font-size:.6875rem;font-weight:700;letter-spacing:.06em;flex-shrink:0}
+    .topnav-right{display:flex;align-items:center;gap:.375rem;flex-shrink:0}
+    .icon-btn{width:32px;height:32px;border-radius:var(--radius-md);border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-600);transition:background .15s}
+    .icon-btn:hover{background:var(--bg)}
+    .badge-wrap{position:relative}
+    .badge{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:var(--admin);border-radius:50%;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:700}
+    .avatar{width:30px;height:30px;border-radius:50%;background:#3B4A6B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;cursor:pointer}
+    .avatar-label{font-size:.8125rem;font-weight:600;color:var(--text-600);margin-right:.25rem}
+
+    /* ═══ BODY ═══ */
+    .body-wrap{display:flex;flex:1;overflow:hidden}
+
+    /* ─── SIDEBAR ─── */
+    .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+    .sidebar::-webkit-scrollbar{width:4px}
+    .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+    .sidebar-admin-header{padding:.875rem .875rem .5rem;display:flex;align-items:center;gap:.5rem}
+    .sidebar-admin-icon{width:28px;height:28px;border-radius:var(--radius-md);background:var(--admin-bg);border:1.5px solid var(--admin-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sidebar-admin-icon svg{width:14px;height:14px;color:var(--admin)}
+    .sidebar-admin-name{font-size:.9375rem;font-weight:700;letter-spacing:-.01em}
+    .sidebar-admin-sub{font-size:.6875rem;color:var(--text-400)}
+    .sidebar-section{padding:.625rem .875rem .25rem;font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-400)}
+    .sidebar-divider{height:1px;background:var(--border);margin:.375rem .75rem}
+    .nav-item{display:flex;align-items:center;gap:.5625rem;padding:.45rem .875rem;border-radius:var(--radius-md);text-decoration:none;color:var(--text-600);font-size:.875rem;font-weight:500;cursor:pointer;transition:background .12s,color .12s;margin:1px .5rem;justify-content:space-between}
+    .nav-item:hover{background:var(--bg);color:var(--text-900)}
+    .nav-item.active{background:var(--admin-bg);color:var(--admin)}
+    .nav-item.active svg{color:var(--admin);opacity:1}
+    .nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.65}
+    .nav-item-left{display:flex;align-items:center;gap:.5625rem}
+    .nav-badge{background:var(--admin-bg);color:var(--admin);border:1px solid var(--admin-border);font-size:.6875rem;font-weight:700;padding:.125rem .375rem;border-radius:99px}
+    .nav-badge-gray{background:var(--bg);color:var(--text-600);border:1px solid var(--border);font-size:.6875rem;font-weight:600;padding:.125rem .375rem;border-radius:99px}
+    .sidebar-footer{margin-top:auto;border-top:1px solid var(--border);padding:.625rem}
+    .sidebar-footer-item{display:flex;align-items:center;gap:.5625rem;padding:.4rem .5rem;border-radius:var(--radius-md);color:var(--text-600);font-size:.8125rem;cursor:pointer;transition:background .12s;text-decoration:none}
+    .sidebar-footer-item:hover{background:var(--bg);color:var(--text-900)}
+    .sidebar-footer-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+
+    /* ─── CONTENT ─── */
+    .content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+    .page-header{background:var(--surface);border-bottom:1px solid var(--border);padding:.875rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-shrink:0}
+    .page-title{font-size:1.0625rem;font-weight:700;letter-spacing:-.02em}
+    .page-breadcrumb{font-size:.75rem;color:var(--text-600);margin-top:.125rem}
+    .page-actions{display:flex;align-items:center;gap:.4375rem}
+    .btn{display:flex;align-items:center;gap:.375rem;padding:.4375rem .875rem;border-radius:var(--radius-md);font-family:'Inter',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;border:none;transition:background .15s;text-decoration:none}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .btn-secondary{background:var(--bg);color:var(--text-600);border:1.5px solid var(--border)}
+    .btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+    .btn svg{width:14px;height:14px}
+
+    .content-inner{padding:1.25rem 1.5rem;flex:1;overflow-y:auto}
+
+    /* Alert banner */
+    .alert-banner{display:flex;align-items:center;gap:.625rem;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--radius-lg);padding:.625rem .875rem;margin-bottom:1rem;font-size:.875rem;color:#92400E}
+    .alert-banner svg{width:16px;height:16px;color:#D97706;flex-shrink:0}
+    .alert-banner a{color:#D97706;font-weight:600;text-decoration:underline;cursor:pointer;margin-left:.25rem}
+
+    /* Stats grid */
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.875rem 1rem}
+    .stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.375rem}
+    .stat-label{font-size:.6875rem;font-weight:600;color:var(--text-600);text-transform:uppercase;letter-spacing:.06em}
+    .stat-icon-wrap{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+    .stat-icon-wrap svg{width:14px;height:14px}
+    .stat-value{font-size:1.3125rem;font-weight:700;letter-spacing:-.03em}
+    .stat-sub{font-size:.75rem;color:var(--text-600);margin-top:.125rem;display:flex;align-items:center;gap:.25rem}
+    .up{color:#10B981}.down{color:#DC2626}
+
+    /* Two-column layout */
+    .two-col{display:grid;grid-template-columns:1fr 340px;gap:.75rem}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+    .card-header{padding:.75rem 1.125rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .card-title{font-size:.9375rem;font-weight:600}
+    .card-link{font-size:.8125rem;color:var(--primary-dark);font-weight:500;text-decoration:none;cursor:pointer}
+    .card-link:hover{text-decoration:underline}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:.875rem}
+    thead th{text-align:left;padding:.5625rem .875rem;font-size:.6875rem;font-weight:600;color:var(--text-600);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+    tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:var(--bg)}
+    td{padding:.625rem .875rem;vertical-align:middle}
+
+    /* Vendor row item */
+    .vendor-row-name{font-weight:600}
+    .vendor-row-meta{font-size:.75rem;color:var(--text-600)}
+    .vendor-logo-sm{width:30px;height:30px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:.6875rem;font-weight:700;flex-shrink:0;border:1px solid var(--border)}
+    .vendor-name-cell{display:flex;align-items:center;gap:.625rem}
+
+    /* Chips */
+    .chip{display:inline-flex;align-items:center;padding:.1875rem .5rem;border-radius:99px;font-size:.75rem;font-weight:600}
+    .chip-green{background:#d1fae5;color:#047857}
+    .chip-yellow{background:#fef3c7;color:#d97706}
+    .chip-blue{background:#dbeafe;color:#1d4ed8}
+    .chip-red{background:#fee2e2;color:#b91c1c}
+    .chip-gray{background:#f1f5f9;color:#475569}
+    .chip-purple{background:#f5f3ff;color:#5b21b6}
+    .plan-starter{background:#F1F5F9;color:#475569}
+    .plan-growth{background:#EFF6FF;color:#1E40AF}
+    .plan-enterprise{background:#F5F3FF;color:#5B21B6}
+
+    /* Right column cards */
+    .col-side{display:flex;flex-direction:column;gap:.75rem}
+    .alert-feed{display:flex;flex-direction:column}
+    .alert-item{display:flex;align-items:flex-start;gap:.625rem;padding:.625rem .875rem;border-bottom:1px solid var(--border)}
+    .alert-item:last-child{border-bottom:none}
+    .alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+    .alert-dot-red{background:#EF4444}
+    .alert-dot-warn{background:#F59E0B}
+    .alert-dot-blue{background:#3B82F6}
+    .alert-body{flex:1}
+    .alert-title{font-size:.875rem;font-weight:500;line-height:1.35}
+    .alert-meta{font-size:.75rem;color:var(--text-600);margin-top:.125rem}
+    .alert-action{font-size:.75rem;font-weight:600;color:var(--primary-dark);cursor:pointer;white-space:nowrap;flex-shrink:0;margin-top:2px}
+
+    /* Recent signups */
+    .signup-feed{display:flex;flex-direction:column}
+    .signup-item{display:flex;align-items:center;gap:.625rem;padding:.5625rem .875rem;border-bottom:1px solid var(--border)}
+    .signup-item:last-child{border-bottom:none}
+    .signup-logo{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:.6875rem;font-weight:700;flex-shrink:0}
+    .signup-info{flex:1}
+    .signup-name{font-size:.875rem;font-weight:600}
+    .signup-plan{font-size:.75rem;color:var(--text-600)}
+    .signup-time{font-size:.75rem;color:var(--text-400);white-space:nowrap}
+
+    /* Platform health mini row */
+    .health-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+    .health-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.75rem 1rem;display:flex;align-items:center;gap:.625rem}
+    .health-icon{width:32px;height:32px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .health-icon svg{width:16px;height:16px}
+    .health-label{font-size:.6875rem;color:var(--text-600);font-weight:500}
+    .health-value{font-size:.9375rem;font-weight:700}
+  </style>
+</head>
+<body>
+
+<!-- ═══ TOPNAV ═══ -->
+<header class="topnav">
+  <div class="topnav-left">
+    <a href="../../prototype/v2/launcher.html" class="brand">
+      <div class="brand-icon">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+      </div>
+      <span class="brand-name">App<em>In</em>App</span>
+    </a>
+    <div class="divider-v"></div>
+    <div class="admin-badge">
+      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      ADMIN CONSOLE
+    </div>
+  </div>
+  <div class="topnav-right">
+    <button class="icon-btn" title="Global search">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+    </button>
+    <div class="badge-wrap">
+      <button class="icon-btn" title="Platform alerts">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+      </button>
+      <div class="badge">5</div>
+    </div>
+    <div class="divider-v"></div>
+    <span class="avatar-label">Super Admin</span>
+    <div class="avatar" title="Admin Account">SA</div>
+  </div>
+</header>
+
+<!-- ═══ BODY ═══ -->
+<div class="body-wrap">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+    <div class="sidebar-admin-header">
+      <div class="sidebar-admin-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      </div>
+      <div>
+        <div class="sidebar-admin-name">Admin Console</div>
+        <div class="sidebar-admin-sub">AppInApp Platform</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">Platform</div>
+    <a class="nav-item active" href="dashboard.html">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+        Dashboard
+      </div>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+        Analytics
+      </div>
+    </a>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">Management</div>
+    <a class="nav-item" href="vendors.html">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>
+        Vendors
+      </div>
+      <span class="nav-badge-gray">142</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+        Businesses
+      </div>
+      <span class="nav-badge-gray">387</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+        Users
+      </div>
+      <span class="nav-badge-gray">1.2K</span>
+    </a>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">System</div>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+        Billing
+      </div>
+      <span class="nav-badge" style="background:#fee2e2;color:#b91c1c;border-color:#fecaca">2</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 00.657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 005.427-.63 48.05 48.05 0 00.582-4.717.532.532 0 00-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.959.401v0a.656.656 0 00.658-.663 48.422 48.422 0 00-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 01-.61-.58v0z"/></svg>
+        Integrations
+      </div>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Settings
+      </div>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/></svg>
+        Audit Log
+      </div>
+    </a>
+
+    <div class="sidebar-footer">
+      <a class="sidebar-footer-item" href="../launcher.html">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+        Exit Admin
+      </a>
+    </div>
+  </aside>
+
+  <!-- ─── CONTENT ─── -->
+  <main class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Platform Dashboard</div>
+        <div class="page-breadcrumb">AppInApp Admin · March 9, 2026</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+          Export Report
+        </button>
+        <a class="btn btn-primary" href="vendors.html">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Add Vendor
+        </a>
+      </div>
+    </div>
+
+    <div class="content-inner">
+
+      <!-- Alert banner -->
+      <div class="alert-banner">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+        <span><strong>2 vendors</strong> have overdue invoices — payment not received in 30+ days.</span>
+        <a onclick="window.location.href='vendors.html'">View delinquent accounts →</a>
+      </div>
+
+      <!-- Stats grid (6 stats in 3+3) -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-label">Total Vendors</div>
+            <div class="stat-icon-wrap" style="background:#EEF2FF">
+              <svg fill="none" stroke="#6366F1" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">142</div>
+          <div class="stat-sub"><span class="up">↑ 8</span> new this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-label">Active Businesses</div>
+            <div class="stat-icon-wrap" style="background:#F0FDF4">
+              <svg fill="none" stroke="#16A34A" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">387</div>
+          <div class="stat-sub"><span class="up">↑ 12</span> this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-label">GMV Today</div>
+            <div class="stat-icon-wrap" style="background:#FEF9C3">
+              <svg fill="none" stroke="#CA8A04" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">KES 2.4M</div>
+          <div class="stat-sub"><span class="up">↑ 9%</span> vs yesterday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-label">Orders Today</div>
+            <div class="stat-icon-wrap" style="background:#FFF1F2">
+              <svg fill="none" stroke="#E11D48" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">8,420</div>
+          <div class="stat-sub"><span class="up">↑ 14%</span> vs yesterday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-label">MRR</div>
+            <div class="stat-icon-wrap" style="background:#F0F9FF">
+              <svg fill="none" stroke="#0284C7" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">KES 684K</div>
+          <div class="stat-sub"><span class="up">↑ 3%</span> vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-label">System Uptime</div>
+            <div class="stat-icon-wrap" style="background:#F0FDF4">
+              <svg fill="none" stroke="#16A34A" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg>
+            </div>
+          </div>
+          <div class="stat-value">99.8%</div>
+          <div class="stat-sub" style="color:#16A34A">All systems operational</div>
+        </div>
+      </div>
+
+      <!-- Two column -->
+      <div class="two-col">
+        <!-- Main: Top Vendors table -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Top Vendors by GMV (30 days)</span>
+              <a class="card-link" href="vendors.html">View all vendors →</a>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Vendor</th>
+                    <th>Plan</th>
+                    <th>Status</th>
+                    <th>Businesses</th>
+                    <th>GMV (30d)</th>
+                    <th>Orders</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr onclick="window.location.href='vendor-detail.html'">
+                    <td>
+                      <div class="vendor-name-cell">
+                        <div class="vendor-logo-sm" style="background:#FEF3C7;color:#D97706">PH</div>
+                        <div>
+                          <div class="vendor-row-name">Prestige Hotels</div>
+                          <div class="vendor-row-meta">Nairobi · 4 businesses</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="chip plan-enterprise">Enterprise</span></td>
+                    <td><span class="chip chip-green">Active</span></td>
+                    <td>4</td>
+                    <td style="font-weight:600">KES 623K</td>
+                    <td>22,410</td>
+                  </tr>
+                  <tr onclick="window.location.href='vendor-detail.html'">
+                    <td>
+                      <div class="vendor-name-cell">
+                        <div class="vendor-logo-sm" style="background:#DCFCE7;color:#16A34A">JH</div>
+                        <div>
+                          <div class="vendor-row-name">Johari Holdings</div>
+                          <div class="vendor-row-meta">Nairobi · 3 businesses</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="chip plan-enterprise">Enterprise</span></td>
+                    <td><span class="chip chip-green">Active</span></td>
+                    <td>3</td>
+                    <td style="font-weight:600">KES 486K</td>
+                    <td>17,840</td>
+                  </tr>
+                  <tr onclick="window.location.href='vendor-detail.html'">
+                    <td>
+                      <div class="vendor-name-cell">
+                        <div class="vendor-logo-sm" style="background:#EFF6FF;color:#1D4ED8">SG</div>
+                        <div>
+                          <div class="vendor-row-name">Savannah Group</div>
+                          <div class="vendor-row-meta">Nairobi · 2 businesses</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="chip plan-growth">Growth</span></td>
+                    <td><span class="chip chip-green">Active</span></td>
+                    <td>2</td>
+                    <td style="font-weight:600">KES 284K</td>
+                    <td>12,130</td>
+                  </tr>
+                  <tr onclick="window.location.href='vendor-detail.html'">
+                    <td>
+                      <div class="vendor-name-cell">
+                        <div class="vendor-logo-sm" style="background:#FEF9C3;color:#A16207">MR</div>
+                        <div>
+                          <div class="vendor-row-name">Mombasa Rides</div>
+                          <div class="vendor-row-meta">Mombasa · 2 businesses</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="chip plan-growth">Growth</span></td>
+                    <td><span class="chip chip-green">Active</span></td>
+                    <td>2</td>
+                    <td style="font-weight:600">KES 198K</td>
+                    <td>8,420</td>
+                  </tr>
+                  <tr onclick="window.location.href='vendor-detail.html'">
+                    <td>
+                      <div class="vendor-name-cell">
+                        <div class="vendor-logo-sm" style="background:#FCE7F3;color:#BE185D">UE</div>
+                        <div>
+                          <div class="vendor-row-name">Urban Eats Kenya</div>
+                          <div class="vendor-row-meta">Nairobi · 1 business</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="chip plan-growth">Growth</span></td>
+                    <td><span class="chip chip-green">Active</span></td>
+                    <td>1</td>
+                    <td style="font-weight:600">KES 134K</td>
+                    <td>5,710</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Platform health row -->
+          <div class="health-row" style="margin-top:.75rem">
+            <div class="health-card">
+              <div class="health-icon" style="background:#F0FDF4">
+                <svg fill="none" stroke="#16A34A" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+              </div>
+              <div>
+                <div class="health-label">API Response</div>
+                <div class="health-value" style="color:#16A34A">214 ms avg</div>
+              </div>
+            </div>
+            <div class="health-card">
+              <div class="health-icon" style="background:#FFFBEB">
+                <svg fill="none" stroke="#D97706" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 2.5c0 2.278-3.694 4.125-8.25 4.125S3.75 11.153 3.75 8.875m16.5 2.5c0 2.278-3.694 4.125-8.25 4.125S3.75 13.653 3.75 11.375"/></svg>
+              </div>
+              <div>
+                <div class="health-label">DB Connection Pool</div>
+                <div class="health-value" style="color:#D97706">68 / 100 used</div>
+              </div>
+            </div>
+            <div class="health-card">
+              <div class="health-icon" style="background:#EFF6FF">
+                <svg fill="none" stroke="#2563EB" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg>
+              </div>
+              <div>
+                <div class="health-label">Queue Depth</div>
+                <div class="health-value">142 jobs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="col-side">
+          <!-- Alerts -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Platform Alerts</span>
+              <span class="chip chip-red">5</span>
+            </div>
+            <div class="alert-feed">
+              <div class="alert-item">
+                <div class="alert-dot alert-dot-red"></div>
+                <div class="alert-body">
+                  <div class="alert-title">Safari Catering — invoice overdue</div>
+                  <div class="alert-meta">Invoice #1024 · 24 days past due</div>
+                </div>
+                <div class="alert-action" onclick="window.location.href='vendor-detail.html'">View →</div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-dot alert-dot-red"></div>
+                <div class="alert-body">
+                  <div class="alert-title">Kikuyu Farms — invoice overdue</div>
+                  <div class="alert-meta">Invoice #1031 · 16 days past due</div>
+                </div>
+                <div class="alert-action" onclick="window.location.href='vendor-detail.html'">View →</div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-dot alert-dot-warn"></div>
+                <div class="alert-body">
+                  <div class="alert-title">The Junction Mall — storage at 94%</div>
+                  <div class="alert-meta">2.8 GB / 3 GB used</div>
+                </div>
+                <div class="alert-action">Notify</div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-dot alert-dot-warn"></div>
+                <div class="alert-body">
+                  <div class="alert-title">Westlands Bistro — trial expires in 3 days</div>
+                  <div class="alert-meta">Started Feb 24 · Expires Mar 12</div>
+                </div>
+                <div class="alert-action">Follow up</div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-dot alert-dot-blue"></div>
+                <div class="alert-body">
+                  <div class="alert-title">Brute force attempt on Kikuyu Farms</div>
+                  <div class="alert-meta">6 failed logins · 197.232.54.x · 6h ago</div>
+                </div>
+                <div class="alert-action">Review</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent signups -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Recent Signups</span>
+              <a class="card-link" href="vendors.html">See all →</a>
+            </div>
+            <div class="signup-feed">
+              <div class="signup-item">
+                <div class="signup-logo" style="background:#FEF3C7;color:#D97706">PH</div>
+                <div class="signup-info">
+                  <div class="signup-name">Prestige Hotels</div>
+                  <div class="signup-plan"><span class="chip plan-enterprise" style="font-size:.6875rem">Enterprise Trial</span></div>
+                </div>
+                <div class="signup-time">2h ago</div>
+              </div>
+              <div class="signup-item">
+                <div class="signup-logo" style="background:#F0FDF4;color:#16A34A">KF</div>
+                <div class="signup-info">
+                  <div class="signup-name">Kikuyu Farms</div>
+                  <div class="signup-plan"><span class="chip plan-starter" style="font-size:.6875rem">Starter</span></div>
+                </div>
+                <div class="signup-time">1d ago</div>
+              </div>
+              <div class="signup-item">
+                <div class="signup-logo" style="background:#EFF6FF;color:#1D4ED8">WB</div>
+                <div class="signup-info">
+                  <div class="signup-name">Westlands Bistro</div>
+                  <div class="signup-plan"><span class="chip plan-starter" style="font-size:.6875rem">Starter Trial</span></div>
+                </div>
+                <div class="signup-time">2d ago</div>
+              </div>
+              <div class="signup-item">
+                <div class="signup-logo" style="background:#F3E8FF;color:#7C3AED">JM</div>
+                <div class="signup-info">
+                  <div class="signup-name">The Junction Mall</div>
+                  <div class="signup-plan"><span class="chip plan-enterprise" style="font-size:.6875rem">Enterprise Trial</span></div>
+                </div>
+                <div class="signup-time">5d ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-inner -->
+  </main>
+</div>
+
+</body>
+</html>

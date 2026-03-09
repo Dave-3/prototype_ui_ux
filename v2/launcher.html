@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AppInApp – Launcher v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --primary:#65A694;--primary-dark:#47766C;--primary-light:#CCE0DC;
+      --bg:#F2F7F6;--surface:#fff;--border:#E6F0EE;
+      --text-900:#0C1312;--text-600:#3D5C57;--text-400:#83B4AA;
+      --radius-sm:6px;--radius-md:8px;--radius-lg:10px;--radius-xl:14px;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+      --shadow-md:0 4px 14px rgba(0,0,0,.08);
+      --shadow-lg:0 8px 28px rgba(0,0,0,.12);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-900);min-height:100vh}
+
+    /* ───── TOPBAR ───── */
+    .topbar{
+      position:sticky;top:0;z-index:200;
+      background:rgba(242,247,246,.94);backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border);
+      height:58px;display:flex;align-items:center;justify-content:space-between;
+      padding:0 1.5rem;gap:1rem;
+    }
+    .topbar-left{display:flex;align-items:center;gap:.875rem}
+    .brand{display:flex;align-items:center;gap:.5rem;text-decoration:none;color:inherit}
+    .brand-mark{width:34px;height:34px;background:var(--primary);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center}
+    .brand-mark svg{color:#fff}
+    .brand-name{font-size:1.0625rem;font-weight:700;letter-spacing:-.02em}
+    .brand-name em{font-style:normal;color:var(--primary)}
+    .divider-v{width:1px;height:20px;background:var(--border);flex-shrink:0}
+
+    /* role switcher (demo only) */
+    .role-switcher{display:flex;align-items:center;gap:2px;background:var(--border);border-radius:99px;padding:3px}
+    .role-btn{padding:.25rem .75rem;border-radius:99px;border:none;font-family:'Inter',sans-serif;font-size:.75rem;font-weight:500;color:var(--text-600);background:transparent;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+    .role-btn.active{background:var(--surface);color:var(--primary-dark);box-shadow:var(--shadow-sm)}
+
+    .topbar-right{display:flex;align-items:center;gap:.5rem}
+    .icon-btn{width:34px;height:34px;border-radius:var(--radius-md);background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-600);transition:background .15s}
+    .icon-btn:hover{background:var(--border)}
+    .badge-wrap{position:relative}
+    .notif-badge{position:absolute;top:-2px;right:-2px;width:15px;height:15px;background:#E8503D;border-radius:50%;border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700}
+    .avatar{width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8125rem;font-weight:600;cursor:pointer}
+
+    /* ───── BODY ───── */
+    .body{max-width:1160px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+
+    .greeting{margin-bottom:2rem}
+    .greeting h1{font-size:1.625rem;font-weight:700;letter-spacing:-.03em;margin-bottom:.25rem}
+    .greeting p{color:var(--text-600);font-size:.9375rem}
+
+    /* quick search */
+    .searchbar{
+      display:flex;align-items:center;gap:.625rem;
+      background:var(--surface);border:1.5px solid var(--border);
+      border-radius:var(--radius-lg);padding:.5625rem 1rem;
+      max-width:480px;margin-bottom:2.5rem;transition:border-color .15s,box-shadow .15s;
+    }
+    .searchbar:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(101,166,148,.12)}
+    .searchbar input{border:none;background:transparent;font-family:'Inter',sans-serif;font-size:.9rem;flex:1;outline:none;color:var(--text-900)}
+    .searchbar input::placeholder{color:var(--text-400)}
+    .searchbar svg{color:var(--text-400);flex-shrink:0}
+    .kbd{font-size:.6875rem;color:var(--text-400);background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.125rem .375rem}
+
+    /* section headers */
+    .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .sh-title{font-size:.9375rem;font-weight:600}
+    .sh-sub{font-size:.8125rem;color:var(--text-600)}
+    .sh-action{font-size:.8125rem;color:var(--primary);font-weight:500;cursor:pointer;border:none;background:transparent;font-family:'Inter',sans-serif}
+    .sh-action:hover{text-decoration:underline}
+
+    /* ───── STATS ROW ───── */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.75rem;margin-bottom:2.5rem}
+    .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.125rem}
+    .stat-label{font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-600);margin-bottom:.4rem}
+    .stat-val{font-size:1.5rem;font-weight:700;letter-spacing:-.03em}
+    .stat-delta{font-size:.75rem;margin-top:.25rem;font-weight:500}
+    .up{color:#10b981}.dn{color:#E8503D}.neu{color:var(--text-600)}
+
+    /* ───── BUSINESS GRID ───── */
+    .biz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-bottom:2.5rem;align-items:start}
+
+    .biz-card{
+      background:var(--surface);border:1.5px solid var(--border);
+      border-radius:var(--radius-xl);overflow:hidden;cursor:pointer;
+      transition:box-shadow .2s,border-color .2s;
+      position:relative;
+    }
+    .biz-card:hover{box-shadow:var(--shadow-md);border-color:var(--primary-light)}
+    .biz-card.expanded{
+      grid-column:span 2;
+      border-color:var(--primary);
+      box-shadow:var(--shadow-lg);
+    }
+
+    .biz-stripe{height:4px;background:var(--c,var(--primary))}
+
+    .biz-main{padding:1.125rem 1.125rem .875rem;display:flex;flex-direction:column;gap:.625rem}
+    .biz-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem}
+    .biz-icon{width:44px;height:44px;border-radius:var(--radius-lg);background:var(--ic-bg,var(--primary-light));color:var(--ic,var(--primary-dark));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .biz-icon svg{width:22px;height:22px}
+    .biz-badge{background:#E8503D;color:#fff;font-size:.625rem;font-weight:700;padding:.1875rem .4375rem;border-radius:99px;white-space:nowrap}
+    .biz-type{font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--c,var(--primary));margin-bottom:.125rem}
+    .biz-name{font-size:.9875rem;font-weight:700;letter-spacing:-.01em}
+    .biz-desc{font-size:.8rem;color:var(--text-600);line-height:1.5}
+    .biz-footer{display:flex;align-items:center;justify-content:space-between;padding:.625rem 1.125rem;border-top:1px solid var(--border);background:var(--bg)}
+    .biz-branches{font-size:.75rem;color:var(--text-600);display:flex;align-items:center;gap:.3125rem}
+    .biz-chevron{transition:transform .25s;color:var(--text-400)}
+    .biz-card.expanded .biz-chevron{transform:rotate(180deg)}
+
+    /* expanded body */
+    .biz-expand{
+      overflow:hidden;max-height:0;
+      transition:max-height .3s cubic-bezier(.4,0,.2,1);
+      border-top:1px solid var(--border);
+    }
+    .biz-card.expanded .biz-expand{max-height:600px}
+    .biz-expand-inner{padding:1rem 1.125rem 1.125rem;display:flex;flex-direction:column;gap:1rem}
+
+    /* mini stats inside expanded */
+    .exp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+    .exp-stat{background:var(--bg);border-radius:var(--radius-md);padding:.625rem .75rem}
+    .exp-stat-label{font-size:.625rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-600);margin-bottom:.25rem}
+    .exp-stat-val{font-size:1.125rem;font-weight:700;letter-spacing:-.02em}
+
+    /* branches inside expanded */
+    .exp-branches-title{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-600);margin-bottom:.5rem}
+    .exp-branch-list{display:flex;flex-wrap:wrap;gap:.4375rem}
+    .exp-branch-chip{
+      display:flex;align-items:center;gap:.375rem;
+      padding:.3125rem .625rem;border-radius:99px;
+      border:1px solid var(--border);background:var(--surface);
+      font-size:.8rem;font-weight:500;cursor:pointer;transition:border-color .15s,background .15s;
+    }
+    .exp-branch-chip:hover{border-color:var(--primary);background:var(--primary-light)}
+    .branch-dot{width:6px;height:6px;border-radius:50%}
+
+    /* module shortcuts */
+    .exp-modules{display:flex;flex-wrap:wrap;gap:.375rem}
+    .mod-chip{
+      display:flex;align-items:center;gap:.3125rem;
+      padding:.3125rem .625rem;border-radius:var(--radius-md);
+      background:var(--bg);border:1px solid var(--border);
+      font-size:.8rem;font-weight:500;color:var(--text-600);
+      cursor:pointer;transition:background .15s,color .15s,border-color .15s;
+    }
+    .mod-chip:hover{background:var(--primary-light);color:var(--primary-dark);border-color:var(--primary-light)}
+    .mod-chip svg{width:12px;height:12px;opacity:.7}
+
+    /* open button */
+    .btn-open{
+      display:inline-flex;align-items:center;gap:.4375rem;
+      background:var(--primary);color:#fff;border:none;
+      border-radius:var(--radius-md);padding:.5rem 1.125rem;
+      font-family:'Inter',sans-serif;font-size:.875rem;font-weight:600;
+      cursor:pointer;transition:background .15s;align-self:flex-start;
+    }
+    .btn-open:hover{background:var(--primary-dark)}
+    .btn-open svg{width:13px;height:13px}
+
+    /* ───── VENDOR CARDS (AppInApp Admin) ───── */
+    .vendor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.875rem;margin-bottom:2.5rem}
+    .vendor-card{
+      background:var(--surface);border:1.5px solid var(--border);
+      border-radius:var(--radius-xl);padding:1.125rem;
+      display:flex;align-items:flex-start;gap:.875rem;
+      cursor:pointer;transition:border-color .2s,box-shadow .2s;
+    }
+    .vendor-card:hover{border-color:var(--primary-light);box-shadow:var(--shadow-md)}
+    .vendor-avatar{width:42px;height:42px;background:var(--primary-light);color:var(--primary-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.875rem;font-weight:700;flex-shrink:0}
+    .vendor-info{flex:1;min-width:0}
+    .vendor-name{font-size:.9375rem;font-weight:600;margin-bottom:.25rem}
+    .vendor-meta{font-size:.75rem;color:var(--text-600);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+    .vendor-pill{background:var(--bg);border:1px solid var(--border);padding:.125rem .5rem;border-radius:99px;font-size:.6875rem;font-weight:500}
+    .vendor-stats{display:flex;gap:.875rem;margin-top:.5rem}
+    .vs{font-size:.75rem;color:var(--text-600)}
+    .vs strong{color:var(--text-900);font-weight:600}
+    .vendor-arrow{color:var(--text-400);flex-shrink:0;margin-top:.125rem}
+
+    /* ───── BRANCHES SECTION ───── */
+    .branches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem;margin-bottom:2.5rem}
+    .branch-card{
+      background:var(--surface);border:1.5px solid var(--border);
+      border-radius:var(--radius-lg);padding:1rem 1.125rem;
+      cursor:pointer;transition:border-color .15s,box-shadow .15s;
+    }
+    .branch-card:hover{border-color:var(--primary-light);box-shadow:var(--shadow-sm)}
+    .branch-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.625rem}
+    .branch-name{font-size:.9375rem;font-weight:600}
+    .branch-status{display:flex;align-items:center;gap:.3125rem;font-size:.75rem;font-weight:500}
+    .status-dot{width:6px;height:6px;border-radius:50%}
+    .status-open{color:#10b981}.status-dot-open{background:#10b981}
+    .status-closed{color:#E8503D}.status-dot-closed{background:#E8503D}
+    .branch-loc{font-size:.8rem;color:var(--text-600);margin-bottom:.625rem;display:flex;align-items:center;gap:.25rem}
+    .branch-kpis{display:flex;gap:1rem}
+    .bkpi{font-size:.75rem;color:var(--text-600)}
+    .bkpi strong{display:block;font-size:.9375rem;font-weight:700;color:var(--text-900);letter-spacing:-.02em}
+
+    /* ───── RECENTLY USED ───── */
+    .recent-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.625rem;margin-bottom:2.5rem}
+    .recent-item{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius-lg);padding:.875rem 1rem;
+      display:flex;align-items:center;gap:.75rem;
+      cursor:pointer;transition:border-color .15s,box-shadow .15s;
+    }
+    .recent-item:hover{border-color:var(--primary-light);box-shadow:var(--shadow-sm)}
+    .ri-icon{width:34px;height:34px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ri-info{flex:1;min-width:0}
+    .ri-name{font-size:.875rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ri-meta{font-size:.75rem;color:var(--text-600);margin-top:.1875rem}
+    .ri-time{font-size:.75rem;color:var(--text-400);white-space:nowrap}
+
+    /* ───── CONTEXT CHIP in greeting ───── */
+    .ctx-row{display:flex;align-items:center;gap:.5rem;margin-bottom:1.75rem;flex-wrap:wrap}
+    .ctx-chip{
+      display:inline-flex;align-items:center;gap:.375rem;
+      background:var(--surface);border:1.5px solid var(--border);
+      border-radius:99px;padding:.3125rem .75rem .3125rem .5rem;
+      font-size:.8125rem;font-weight:500;cursor:pointer;
+      transition:border-color .15s;
+    }
+    .ctx-chip:hover{border-color:var(--primary)}
+    .ctx-dot{width:7px;height:7px;border-radius:50%;background:var(--primary)}
+    .ctx-badge{background:var(--primary-light);color:var(--primary-dark);font-size:.6875rem;font-weight:600;padding:.125rem .4375rem;border-radius:99px;margin-left:.25rem}
+
+    /* role label */
+    .role-label{font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:.25rem .625rem;border-radius:99px;border:1.5px solid}
+    .role-superadmin{background:#fef3f2;border-color:#fca5a5;color:#dc2626}
+    .role-vendoradmin{background:#f0fdf4;border-color:#86efac;color:#16a34a}
+    .role-branchadmin{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}
+    .role-supplier{background:#fdf4ff;border-color:#d8b4fe;color:#7c3aed}
+
+    /* hidden by role */
+    .for-vendor{display:none}
+    .for-superadmin{display:none}
+    .for-branch{display:none}
+    .for-supplier{display:none}
+    body.role-vendor-admin .for-vendor{display:block}
+    body.role-vendor-admin .for-superadmin{display:none}
+    body.role-vendor-admin .for-branch{display:none}
+    body.role-superadmin .for-superadmin{display:block}
+    body.role-superadmin .for-vendor{display:none}
+    body.role-superadmin .for-branch{display:none}
+    body.role-branch-admin .for-branch{display:block}
+    body.role-branch-admin .for-vendor{display:none}
+
+    /* ── Impersonation banner ── */
+    .imper-banner{display:none;position:sticky;top:0;z-index:300;background:#EA580C;color:#fff;font-size:.8125rem;font-weight:500;padding:.5rem 1.5rem;align-items:center;justify-content:space-between;gap:.75rem}
+    .imper-banner.visible{display:flex}
+    .imper-banner-left{display:flex;align-items:center;gap:.625rem}
+    .imper-banner svg{width:14px;height:14px;flex-shrink:0}
+    .imper-banner strong{font-weight:700}
+    .imper-exit{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;font-family:'Inter',sans-serif;font-size:.8125rem;font-weight:600;padding:.25rem .75rem;border-radius:99px;cursor:pointer;transition:background .15s;white-space:nowrap}
+    .imper-exit:hover{background:rgba(255,255,255,.3)}
+  </style>
+</head>
+<body class="role-vendor-admin">
+
+<!-- ───── IMPERSONATION BANNER ───── -->
+<div class="imper-banner" id="imperBanner">
+  <div class="imper-banner-left">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+    <span>Viewing as <strong id="imperVendorName">Vendor</strong> — Any actions taken here are on behalf of this vendor</span>
+  </div>
+  <button class="imper-exit" onclick="exitImpersonation()">✕ Exit Impersonation</button>
+</div>
+
+<!-- ───── TOPBAR ───── -->
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#" class="brand">
+      <div class="brand-mark">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+      </div>
+      <span class="brand-name">App<em>In</em>App</span>
+    </a>
+
+    <div class="divider-v"></div>
+
+    <!-- Demo: role toggles -->
+    <div class="role-switcher" title="Demo: switch role view">
+      <button class="role-btn active" onclick="setRole('vendor-admin',this)">Vendor Admin</button>
+      <button class="role-btn" onclick="setRole('superadmin',this)">Super Admin</button>
+      <button class="role-btn" onclick="setRole('branch-admin',this)">Branch Admin</button>
+      <button class="role-btn" onclick="setRole('supplier',this)">Supplier</button>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <button class="icon-btn" title="Search (⌘K)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+    </button>
+    <button class="icon-btn" title="Tasks">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </button>
+    <div class="badge-wrap">
+      <button class="icon-btn" title="Notifications">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+      </button>
+      <div class="notif-badge">3</div>
+    </div>
+    <div class="divider-v"></div>
+    <a href="admin/dashboard.html" title="Admin Console" style="display:flex;align-items:center;gap:.375rem;padding:.3rem .625rem;border-radius:var(--radius-md);background:#FEF2F2;border:1.5px solid #FECACA;color:#DC2626;font-size:.75rem;font-weight:600;text-decoration:none;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='#FFE4E4'" onmouseout="this.style.background='#FEF2F2'">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      Admin
+    </a>
+    <div class="divider-v"></div>
+    <div class="avatar">JO</div>
+  </div>
+</header>
+
+<!-- ───── BODY ───── -->
+<main class="body">
+
+  <!-- Greeting row -->
+  <div class="greeting">
+    <div style="display:flex;align-items:center;gap:.625rem;margin-bottom:.375rem">
+      <h1 id="greetingText">Good morning, James 👋</h1>
+      <span class="role-label role-vendoradmin" id="roleLabel">Vendor Admin</span>
+    </div>
+    <p id="greetingSub">Managing <strong>Johari Holdings</strong> · 3 businesses · 7 branches across Nairobi</p>
+  </div>
+
+  <!-- Context chips -->
+  <div class="ctx-row">
+    <div class="ctx-chip">
+      <div class="ctx-dot"></div>
+      Johari Holdings
+      <span class="ctx-badge" id="ctxBadge">Vendor</span>
+      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+    </div>
+    <div class="searchbar" style="margin-bottom:0;max-width:340px">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+      <input placeholder="Search businesses, orders, staff…"/>
+      <span class="kbd">⌘K</span>
+    </div>
+  </div>
+
+  <!-- ══════════════ VENDOR ADMIN VIEW ══════════════ -->
+  <div class="for-vendor">
+
+    <!-- Stats -->
+    <div class="sh"><span class="sh-title">Today across all businesses</span><span class="sh-sub">Updated just now</span></div>
+    <div class="stats-grid" style="margin-bottom:2.5rem">
+      <div class="stat"><div class="stat-label">Total Revenue</div><div class="stat-val">KES 148,720</div><div class="stat-delta up">↑ 14% vs yesterday</div></div>
+      <div class="stat"><div class="stat-label">Total Orders</div><div class="stat-val">284</div><div class="stat-delta up">↑ 22 this hour</div></div>
+      <div class="stat"><div class="stat-label">Active Branches</div><div class="stat-val">6 / 7</div><div class="stat-delta neu">1 closed today</div></div>
+      <div class="stat"><div class="stat-label">Pending Actions</div><div class="stat-val">18</div><div class="stat-delta dn">↑ 4 new alerts</div></div>
+      <div class="stat"><div class="stat-label">Avg Rating</div><div class="stat-val">4.5 ★</div><div class="stat-delta up">↑ 0.1 this week</div></div>
+    </div>
+
+    <!-- Businesses grid -->
+    <div class="sh">
+      <span class="sh-title">Your businesses</span>
+      <button class="sh-action">+ Add business</button>
+    </div>
+    <div class="biz-grid" id="bizGrid">
+
+      <!-- Restaurant -->
+      <div class="biz-card" id="biz-restaurant" style="--c:#65A694;--ic-bg:#E6F0EE;--ic:#47766C" onclick="toggleBiz('restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top">
+            <div class="biz-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+            </div>
+            <span class="biz-badge">12</span>
+          </div>
+          <div>
+            <div class="biz-type">Restaurant</div>
+            <div class="biz-name">Kilimani Grill</div>
+            <div class="biz-desc" style="margin-top:.25rem">Full-service restaurant chain with dine-in, delivery and reservations</div>
+          </div>
+        </div>
+        <div class="biz-footer">
+          <span class="biz-branches">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            4 branches
+          </span>
+          <svg class="biz-chevron" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+        </div>
+        <div class="biz-expand">
+          <div class="biz-expand-inner">
+            <div class="exp-stats">
+              <div class="exp-stat"><div class="exp-stat-label">Revenue</div><div class="exp-stat-val">KES 84,320</div></div>
+              <div class="exp-stat"><div class="exp-stat-label">Orders</div><div class="exp-stat-val">147</div></div>
+              <div class="exp-stat"><div class="exp-stat-label">Rating</div><div class="exp-stat-val">4.6 ★</div></div>
+            </div>
+            <div>
+              <div class="exp-branches-title">Branches</div>
+              <div class="exp-branch-list">
+                <div class="exp-branch-chip" onclick="event.stopPropagation();openBranch('kilimani-main')"><span class="branch-dot" style="background:#10b981"></span>Kilimani Main</div>
+                <div class="exp-branch-chip" onclick="event.stopPropagation();openBranch('westlands')"><span class="branch-dot" style="background:#10b981"></span>Westlands</div>
+                <div class="exp-branch-chip" onclick="event.stopPropagation();openBranch('karen')"><span class="branch-dot" style="background:#10b981"></span>Karen</div>
+                <div class="exp-branch-chip" onclick="event.stopPropagation();openBranch('cbd')"><span class="branch-dot" style="background:#E8503D"></span>CBD (Closed)</div>
+              </div>
+            </div>
+            <div>
+              <div class="exp-branches-title">Modules</div>
+              <div class="exp-modules">
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('orders','restaurant')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Orders
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('menu','restaurant')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25v14.25"/></svg>Menu
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('reservations','restaurant')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25"/></svg>Reservations
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('delivery','restaurant')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6"/></svg>Delivery
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('staff','restaurant')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>Staff
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('payments','restaurant')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5"/></svg>Payments
+                </div>
+              </div>
+            </div>
+            <button class="btn-open" onclick="event.stopPropagation();goTo('orders','restaurant')">
+              Open Kilimani Grill
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Car Rental -->
+      <div class="biz-card" id="biz-car" style="--c:#0ea5e9;--ic-bg:#e0f2fe;--ic:#0369a1" onclick="toggleBiz('car')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top">
+            <div class="biz-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+            </div>
+          </div>
+          <div>
+            <div class="biz-type">Car Rental</div>
+            <div class="biz-name">Nairobi Cabs</div>
+            <div class="biz-desc" style="margin-top:.25rem">Self-drive &amp; chauffeured vehicle hire with online reservations</div>
+          </div>
+        </div>
+        <div class="biz-footer">
+          <span class="biz-branches">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            2 branches
+          </span>
+          <svg class="biz-chevron" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+        </div>
+        <div class="biz-expand">
+          <div class="biz-expand-inner">
+            <div class="exp-stats">
+              <div class="exp-stat"><div class="exp-stat-label">Bookings</div><div class="exp-stat-val">38</div></div>
+              <div class="exp-stat"><div class="exp-stat-label">Revenue</div><div class="exp-stat-val">KES 42,100</div></div>
+              <div class="exp-stat"><div class="exp-stat-label">Fleet Active</div><div class="exp-stat-val">14 / 20</div></div>
+            </div>
+            <div>
+              <div class="exp-branches-title">Locations</div>
+              <div class="exp-branch-list">
+                <div class="exp-branch-chip"><span class="branch-dot" style="background:#10b981"></span>JKIA Terminal</div>
+                <div class="exp-branch-chip"><span class="branch-dot" style="background:#10b981"></span>Upperhill Office</div>
+              </div>
+            </div>
+            <div>
+              <div class="exp-branches-title">Modules</div>
+              <div class="exp-modules">
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('bookings','car')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5"/></svg>Bookings
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('fleet','car')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6"/></svg>Fleet
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('customers','car')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>Customers
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('payments','car')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5"/></svg>Payments
+                </div>
+              </div>
+            </div>
+            <button class="btn-open" style="background:#0ea5e9" onclick="event.stopPropagation();goTo('bookings','car')">
+              Open Nairobi Cabs
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logistics -->
+      <div class="biz-card" id="biz-logistics" style="--c:#f97316;--ic-bg:#ffedd5;--ic:#c2410c" onclick="toggleBiz('logistics')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top">
+            <div class="biz-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0121.485 12 59.768 59.768 0 013.27 20.875L5.999 12zm0 0h7.5"/></svg>
+            </div>
+            <span class="biz-badge">6</span>
+          </div>
+          <div>
+            <div class="biz-type">Logistics</div>
+            <div class="biz-name">QuickShip Express</div>
+            <div class="biz-desc" style="margin-top:.25rem">Same-day &amp; scheduled parcel delivery within Nairobi</div>
+          </div>
+        </div>
+        <div class="biz-footer">
+          <span class="biz-branches">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            1 hub
+          </span>
+          <svg class="biz-chevron" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+        </div>
+        <div class="biz-expand">
+          <div class="biz-expand-inner">
+            <div class="exp-stats">
+              <div class="exp-stat"><div class="exp-stat-label">Dispatches</div><div class="exp-stat-val">99</div></div>
+              <div class="exp-stat"><div class="exp-stat-label">Revenue</div><div class="exp-stat-val">KES 22,300</div></div>
+              <div class="exp-stat"><div class="exp-stat-label">On-time</div><div class="exp-stat-val">91%</div></div>
+            </div>
+            <div>
+              <div class="exp-branches-title">Hubs</div>
+              <div class="exp-branch-list">
+                <div class="exp-branch-chip"><span class="branch-dot" style="background:#10b981"></span>Industrial Area Hub</div>
+              </div>
+            </div>
+            <div>
+              <div class="exp-branches-title">Modules</div>
+              <div class="exp-modules">
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('dispatches','logistics')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0121.485 12"/></svg>Dispatches
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('riders','logistics')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0"/></svg>Riders
+                </div>
+                <div class="mod-chip" onclick="event.stopPropagation();goTo('tracking','logistics')">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25"/></svg>Tracking
+                </div>
+              </div>
+            </div>
+            <button class="btn-open" style="background:#f97316" onclick="event.stopPropagation();goTo('dispatches','logistics')">
+              Open QuickShip
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /biz-grid -->
+
+    <!-- Branches section -->
+    <div class="sh">
+      <span class="sh-title">Your branches</span>
+      <button class="sh-action">+ Add branch</button>
+    </div>
+    <div class="branches-grid">
+      <div class="branch-card" onclick="openBranch('kilimani-main')">
+        <div class="branch-card-top">
+          <div class="branch-name">Kilimani Main</div>
+          <div class="branch-status"><span class="status-dot status-dot-open"></span><span class="status-open">Open</span></div>
+        </div>
+        <div class="branch-loc">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+          Kilimani, Nairobi · Restaurant
+        </div>
+        <div class="branch-kpis">
+          <div class="bkpi"><strong>KES 37k</strong>Revenue</div>
+          <div class="bkpi"><strong>64</strong>Orders</div>
+          <div class="bkpi"><strong>18/32</strong>Tables</div>
+        </div>
+      </div>
+      <div class="branch-card" onclick="openBranch('westlands')">
+        <div class="branch-card-top">
+          <div class="branch-name">Westlands</div>
+          <div class="branch-status"><span class="status-dot status-dot-open"></span><span class="status-open">Open</span></div>
+        </div>
+        <div class="branch-loc">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+          Westlands, Nairobi · Restaurant
+        </div>
+        <div class="branch-kpis">
+          <div class="bkpi"><strong>KES 29k</strong>Revenue</div>
+          <div class="bkpi"><strong>51</strong>Orders</div>
+          <div class="bkpi"><strong>12/24</strong>Tables</div>
+        </div>
+      </div>
+      <div class="branch-card" onclick="openBranch('jkia')">
+        <div class="branch-card-top">
+          <div class="branch-name">JKIA Terminal</div>
+          <div class="branch-status"><span class="status-dot status-dot-open"></span><span class="status-open">Open</span></div>
+        </div>
+        <div class="branch-loc">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+          JKIA, Nairobi · Car Rental
+        </div>
+        <div class="branch-kpis">
+          <div class="bkpi"><strong>KES 25k</strong>Revenue</div>
+          <div class="bkpi"><strong>22</strong>Bookings</div>
+          <div class="bkpi"><strong>8/12</strong>Vehicles</div>
+        </div>
+      </div>
+      <div class="branch-card" onclick="openBranch('industrial')">
+        <div class="branch-card-top">
+          <div class="branch-name">Industrial Area Hub</div>
+          <div class="branch-status"><span class="status-dot status-dot-open"></span><span class="status-open">Open</span></div>
+        </div>
+        <div class="branch-loc">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+          Industrial Area, Nairobi · Logistics
+        </div>
+        <div class="branch-kpis">
+          <div class="bkpi"><strong>KES 22k</strong>Revenue</div>
+          <div class="bkpi"><strong>99</strong>Dispatches</div>
+          <div class="bkpi"><strong>91%</strong>On-time</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recently used -->
+    <div class="sh"><span class="sh-title">Recently accessed</span></div>
+    <div class="recent-list">
+      <div class="recent-item" onclick="goTo('orders','restaurant')">
+        <div class="ri-icon" style="background:#E6F0EE;color:#47766C"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg></div>
+        <div class="ri-info"><div class="ri-name">Live Orders — Kilimani Grill</div><div class="ri-meta">12 pending · Kilimani Main Branch</div></div>
+        <div class="ri-time">2m ago</div>
+      </div>
+      <div class="recent-item" onclick="goTo('dispatches','logistics')">
+        <div class="ri-icon" style="background:#ffedd5;color:#c2410c"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0121.485 12"/></svg></div>
+        <div class="ri-info"><div class="ri-name">Dispatches — QuickShip Express</div><div class="ri-meta">6 active · Industrial Area Hub</div></div>
+        <div class="ri-time">18m ago</div>
+      </div>
+      <div class="recent-item" onclick="goTo('bookings','car')">
+        <div class="ri-icon" style="background:#e0f2fe;color:#0369a1"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6"/></svg></div>
+        <div class="ri-info"><div class="ri-name">Bookings — Nairobi Cabs</div><div class="ri-meta">JKIA Terminal · 3 pickups today</div></div>
+        <div class="ri-time">1h ago</div>
+      </div>
+    </div>
+
+  </div><!-- /for-vendor -->
+
+  <!-- ══════════════ SUPER ADMIN VIEW ══════════════ -->
+  <div class="for-superadmin">
+
+    <!-- Platform stats -->
+    <div class="sh"><span class="sh-title">Platform overview</span><span class="sh-sub">All vendors · live</span></div>
+    <div class="stats-grid" style="margin-bottom:2.5rem">
+      <div class="stat"><div class="stat-label">Platform Revenue</div><div class="stat-val">KES 4.2M</div><div class="stat-delta up">↑ 8% MTD</div></div>
+      <div class="stat"><div class="stat-label">Active Vendors</div><div class="stat-val">128</div><div class="stat-delta up">↑ 4 this week</div></div>
+      <div class="stat"><div class="stat-label">Total Branches</div><div class="stat-val">394</div><div class="stat-delta neu">+6 pending</div></div>
+      <div class="stat"><div class="stat-label">Orders Today</div><div class="stat-val">5,831</div><div class="stat-delta up">↑ 12%</div></div>
+      <div class="stat"><div class="stat-label">Platform Uptime</div><div class="stat-val">99.97%</div><div class="stat-delta up">All systems go</div></div>
+    </div>
+
+    <div class="sh"><span class="sh-title">Vendors</span><button class="sh-action">+ Onboard vendor</button></div>
+    <div class="vendor-grid">
+      <div class="vendor-card" onclick="drillVendor('johari')">
+        <div class="vendor-avatar">JH</div>
+        <div class="vendor-info">
+          <div class="vendor-name">Johari Holdings</div>
+          <div class="vendor-meta">
+            <span class="vendor-pill">3 businesses</span>
+            <span class="vendor-pill">7 branches</span>
+            <span class="vendor-pill" style="background:#d1fae5;border-color:#6ee7b7;color:#065f46">Active</span>
+          </div>
+          <div class="vendor-stats">
+            <div class="vs"><strong>KES 148k</strong> today</div>
+            <div class="vs"><strong>284</strong> orders</div>
+          </div>
+        </div>
+        <svg class="vendor-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      </div>
+      <div class="vendor-card">
+        <div class="vendor-avatar" style="background:#e0e7ff;color:#4338ca">NF</div>
+        <div class="vendor-info">
+          <div class="vendor-name">Nairobi Flavours Group</div>
+          <div class="vendor-meta">
+            <span class="vendor-pill">1 business</span>
+            <span class="vendor-pill">12 branches</span>
+            <span class="vendor-pill" style="background:#d1fae5;border-color:#6ee7b7;color:#065f46">Active</span>
+          </div>
+          <div class="vendor-stats">
+            <div class="vs"><strong>KES 92k</strong> today</div>
+            <div class="vs"><strong>198</strong> orders</div>
+          </div>
+        </div>
+        <svg class="vendor-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      </div>
+      <div class="vendor-card">
+        <div class="vendor-avatar" style="background:#ffedd5;color:#c2410c">SK</div>
+        <div class="vendor-info">
+          <div class="vendor-name">Savanna Kitchen</div>
+          <div class="vendor-meta">
+            <span class="vendor-pill">1 business</span>
+            <span class="vendor-pill">3 branches</span>
+            <span class="vendor-pill" style="background:#fef3c7;border-color:#fcd34d;color:#92400e">Trial</span>
+          </div>
+          <div class="vendor-stats">
+            <div class="vs"><strong>KES 18k</strong> today</div>
+            <div class="vs"><strong>34</strong> orders</div>
+          </div>
+        </div>
+        <svg class="vendor-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      </div>
+      <div class="vendor-card">
+        <div class="vendor-avatar" style="background:#fce7f3;color:#be185d">TM</div>
+        <div class="vendor-info">
+          <div class="vendor-name">TechnaMobility</div>
+          <div class="vendor-meta">
+            <span class="vendor-pill">2 businesses</span>
+            <span class="vendor-pill">4 branches</span>
+            <span class="vendor-pill" style="background:#d1fae5;border-color:#6ee7b7;color:#065f46">Active</span>
+          </div>
+          <div class="vendor-stats">
+            <div class="vs"><strong>KES 61k</strong> today</div>
+            <div class="vs"><strong>88</strong> bookings</div>
+          </div>
+        </div>
+        <svg class="vendor-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      </div>
+    </div>
+
+  </div><!-- /for-superadmin -->
+
+  <!-- ══════════════ BRANCH ADMIN VIEW ══════════════ -->
+  <div class="for-branch">
+
+    <div class="sh"><span class="sh-title">Kilimani Main — Today</span><span class="sh-sub">Restaurant · Open now</span></div>
+    <div class="stats-grid" style="margin-bottom:2.5rem">
+      <div class="stat"><div class="stat-label">Revenue</div><div class="stat-val">KES 37,400</div><div class="stat-delta up">↑ 9% vs yesterday</div></div>
+      <div class="stat"><div class="stat-label">Orders</div><div class="stat-val">64</div><div class="stat-delta up">↑ 5 this hour</div></div>
+      <div class="stat"><div class="stat-label">Tables</div><div class="stat-val">18 / 32</div><div class="stat-delta neu">56% occupied</div></div>
+      <div class="stat"><div class="stat-label">Kitchen Queue</div><div class="stat-val">6</div><div class="stat-delta dn">2 delayed</div></div>
+    </div>
+
+    <div class="sh"><span class="sh-title">Modules — Kilimani Grill</span></div>
+    <div class="biz-grid" style="grid-template-columns:repeat(auto-fill,minmax(190px,1fr))">
+      <div class="biz-card" style="--c:#65A694;--ic-bg:#E6F0EE;--ic:#47766C;cursor:pointer" onclick="goTo('orders','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg></div>
+          <div><div class="biz-name">Orders</div><div class="biz-desc" style="margin-top:.25rem">Live, history &amp; fulfilment</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">12 live</span></div>
+      </div>
+      <div class="biz-card" style="--c:#f59e0b;--ic-bg:#fef3c7;--ic:#d97706;cursor:pointer" onclick="goTo('menu','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25v14.25"/></svg></div>
+          <div><div class="biz-name">Menu</div><div class="biz-desc" style="margin-top:.25rem">Products &amp; pricing</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches">124 items</span></div>
+      </div>
+      <div class="biz-card" style="--c:#8b5cf6;--ic-bg:#ede9fe;--ic:#7c3aed;cursor:pointer" onclick="goTo('reservations','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5"/></svg></div>
+          <div><div class="biz-name">Reservations</div><div class="biz-desc" style="margin-top:.25rem">Bookings &amp; calendar</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">3 tonight</span></div>
+      </div>
+      <div class="biz-card" style="--c:#f97316;--ic-bg:#ffedd5;--ic:#c2410c;cursor:pointer" onclick="goTo('delivery','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6"/></svg></div>
+          <div><div class="biz-name">Delivery</div><div class="biz-desc" style="margin-top:.25rem">Riders &amp; dispatches</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches">6 active</span></div>
+      </div>
+      <div class="biz-card" style="--c:#6366f1;--ic-bg:#e0e7ff;--ic:#4338ca;cursor:pointer" onclick="goTo('staff','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg></div>
+          <div><div class="biz-name">Staff</div><div class="biz-desc" style="margin-top:.25rem">Roster &amp; tasks</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">5 tasks</span></div>
+      </div>
+    </div>
+
+  </div><!-- /for-branch -->
+
+  <!-- ══════════════ SUPPLIER VIEW ══════════════ -->
+  <div class="for-supplier">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:2rem;text-align:center;color:var(--text-600)">
+      <div style="font-size:2rem;margin-bottom:.5rem">🏭</div>
+      <div style="font-weight:600;font-size:1rem;color:var(--text-900);margin-bottom:.375rem">Supplier View</div>
+      <div style="font-size:.875rem">Supplier Admin sees vendors they supply to, purchase orders, catalogue &amp; invoicing. To be designed in next iteration.</div>
+    </div>
+  </div>
+
+</main>
+
+<footer style="border-top:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;font-size:.8125rem;color:var(--text-400)">
+  <div style="display:flex;gap:1.25rem">
+    <a href="#" style="color:var(--text-600);text-decoration:none">Help</a>
+    <a href="#" style="color:var(--text-600);text-decoration:none">API Docs</a>
+    <a href="#" style="color:var(--text-600);text-decoration:none">Status</a>
+  </div>
+  <span>© 2026 AppInApp · Prototype v2</span>
+</footer>
+
+<script>
+/* ─── Role switcher ─── */
+const roleConfig = {
+  'vendor-admin':  { label:'Vendor Admin',  cls:'role-vendoradmin',  greeting:'Good morning, James 👋', sub:'Managing <strong>Johari Holdings</strong> · 3 businesses · 7 branches across Nairobi', ctx:'Johari Holdings', ctxBadge:'Vendor' },
+  'superadmin':    { label:'Super Admin',   cls:'role-superadmin',   greeting:'Good morning, James 👋', sub:'AppInApp platform · <strong>128 active vendors</strong> · KES 4.2M revenue MTD', ctx:'AppInApp Platform', ctxBadge:'Super Admin' },
+  'branch-admin':  { label:'Branch Admin',  cls:'role-branchadmin',  greeting:'Good morning, Sarah 👋', sub:'Managing <strong>Kilimani Main Branch</strong> · Kilimani Grill · Johari Holdings', ctx:'Kilimani Main', ctxBadge:'Branch' },
+  'supplier':      { label:'Supplier',      cls:'role-supplier',     greeting:'Good morning, Ahmed 👋', sub:'Supplier account · <strong>FreshFarm Supplies</strong> · 3 vendor partners', ctx:'FreshFarm Supplies', ctxBadge:'Supplier' },
+};
+
+function setRole(role, btn) {
+  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.body.className = 'role-' + role;
+  const cfg = roleConfig[role];
+  document.getElementById('greetingText').textContent = cfg.greeting;
+  document.getElementById('greetingSub').innerHTML = cfg.sub;
+  document.getElementById('roleLabel').textContent = cfg.label;
+  document.getElementById('roleLabel').className = 'role-label ' + cfg.cls;
+  document.querySelector('.ctx-chip').childNodes[2].textContent = ' ' + cfg.ctx + ' ';
+  document.getElementById('ctxBadge').textContent = cfg.ctxBadge;
+
+  // supplier needs for-supplier shown
+  if(role === 'supplier') {
+    document.querySelector('.for-supplier').style.display = 'block';
+  }
+}
+
+/* ─── Impersonation ─── */
+function exitImpersonation() {
+  sessionStorage.removeItem('impersonating');
+  sessionStorage.removeItem('impersonateVendorId');
+  sessionStorage.removeItem('impersonateVendorName');
+  sessionStorage.removeItem('role');
+  document.getElementById('imperBanner').classList.remove('visible');
+  window.location.href = 'admin/vendors.html';
+}
+
+(function initImpersonation() {
+  if (sessionStorage.getItem('impersonating') === 'true') {
+    const name = sessionStorage.getItem('impersonateVendorName') || 'Vendor';
+    const banner = document.getElementById('imperBanner');
+    document.getElementById('imperVendorName').textContent = name;
+    banner.classList.add('visible');
+    // Also switch topbar to show who we are viewing as
+    const greetEl = document.getElementById('greetingText');
+    if (greetEl) greetEl.textContent = 'Viewing as ' + name;
+    const subEl = document.getElementById('greetingSub');
+    if (subEl) subEl.innerHTML = 'Impersonation session — <span style="color:#EA580C;font-weight:600">actions are logged and reversible</span>';
+  }
+})();
+
+/* ─── Business card expand ─── */
+let openBizId = null;
+function toggleBiz(id) {
+  const card = document.getElementById('biz-' + id);
+  if (!card) return;
+  if (openBizId && openBizId !== id) {
+    document.getElementById('biz-' + openBizId)?.classList.remove('expanded');
+  }
+  card.classList.toggle('expanded');
+  openBizId = card.classList.contains('expanded') ? id : null;
+}
+
+/* ─── Navigation ─── */
+function goTo(module, biz) {
+  sessionStorage.setItem('activeApp', module);
+  sessionStorage.setItem('activeBiz', biz);
+  window.location.href = 'layout.html';
+}
+
+function openBranch(branchId) {
+  sessionStorage.setItem('activeBranch', branchId);
+  sessionStorage.setItem('activeApp', 'orders');
+  window.location.href = 'layout.html';
+}
+
+function drillVendor(vendorId) {
+  // Super admin drills into a vendor — would show that vendor's launcher
+  sessionStorage.setItem('activeVendor', vendorId);
+  alert('In full app: would switch context to ' + vendorId + ' and show their businesses');
+}
+</script>
+</body>
+</html>

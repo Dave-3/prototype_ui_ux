@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AppInApp Admin – Vendors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --primary:#65A694;--primary-dark:#47766C;--primary-light:#CCE0DC;
+      --bg:#F2F7F6;--surface:#fff;--border:#E6F0EE;
+      --text-900:#0C1312;--text-600:#3D5C57;--text-400:#83B4AA;
+      --admin:#DC2626;--admin-bg:#FEF2F2;--admin-border:#FECACA;
+      --sidebar-w:232px;--topnav-h:56px;
+      --radius-sm:6px;--radius-md:8px;--radius-lg:10px;--radius-xl:14px;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#F4F5F7;color:var(--text-900);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+    /* ═══ TOPNAV ═══ */
+    .topnav{height:var(--topnav-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1rem 0 .875rem;z-index:200;flex-shrink:0;gap:.5rem}
+    .topnav-left{display:flex;align-items:center;gap:.625rem}
+    .brand{display:flex;align-items:center;gap:.4375rem;text-decoration:none;color:inherit;flex-shrink:0}
+    .brand-icon{width:30px;height:30px;background:var(--primary);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center}
+    .brand-icon svg{color:#fff}
+    .brand-name{font-size:1rem;font-weight:700;letter-spacing:-.02em}
+    .brand-name em{font-style:normal;color:var(--primary)}
+    .divider-v{width:1px;height:20px;background:var(--border);flex-shrink:0}
+    .admin-badge{display:flex;align-items:center;gap:.375rem;padding:.25rem .625rem;background:var(--admin-bg);border:1.5px solid var(--admin-border);border-radius:99px;color:var(--admin);font-size:.6875rem;font-weight:700;letter-spacing:.06em;flex-shrink:0}
+    .topnav-right{display:flex;align-items:center;gap:.375rem;flex-shrink:0}
+    .icon-btn{width:32px;height:32px;border-radius:var(--radius-md);border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-600);transition:background .15s}
+    .icon-btn:hover{background:var(--bg)}
+    .badge-wrap{position:relative}
+    .badge{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:var(--admin);border-radius:50%;border:2px solid var(--surface);display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:700}
+    .avatar{width:30px;height:30px;border-radius:50%;background:#3B4A6B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;cursor:pointer}
+    .avatar-label{font-size:.8125rem;font-weight:600;color:var(--text-600);margin-right:.25rem}
+
+    /* ═══ BODY ═══ */
+    .body-wrap{display:flex;flex:1;overflow:hidden}
+
+    /* ─── SIDEBAR ─── */
+    .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+    .sidebar::-webkit-scrollbar{width:4px}
+    .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+    .sidebar-admin-header{padding:.875rem .875rem .5rem;display:flex;align-items:center;gap:.5rem}
+    .sidebar-admin-icon{width:28px;height:28px;border-radius:var(--radius-md);background:var(--admin-bg);border:1.5px solid var(--admin-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sidebar-admin-icon svg{width:14px;height:14px;color:var(--admin)}
+    .sidebar-admin-name{font-size:.9375rem;font-weight:700;letter-spacing:-.01em}
+    .sidebar-admin-sub{font-size:.6875rem;color:var(--text-400)}
+    .sidebar-section{padding:.625rem .875rem .25rem;font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-400)}
+    .sidebar-divider{height:1px;background:var(--border);margin:.375rem .75rem}
+    .nav-item{display:flex;align-items:center;gap:.5625rem;padding:.45rem .875rem;border-radius:var(--radius-md);text-decoration:none;color:var(--text-600);font-size:.875rem;font-weight:500;cursor:pointer;transition:background .12s,color .12s;margin:1px .5rem;justify-content:space-between}
+    .nav-item:hover{background:var(--bg);color:var(--text-900)}
+    .nav-item.active{background:var(--admin-bg);color:var(--admin)}
+    .nav-item.active svg{color:var(--admin);opacity:1}
+    .nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.65}
+    .nav-item-left{display:flex;align-items:center;gap:.5625rem}
+    .nav-badge-gray{background:var(--bg);color:var(--text-600);border:1px solid var(--border);font-size:.6875rem;font-weight:600;padding:.125rem .375rem;border-radius:99px}
+    .nav-badge-red{background:var(--admin-bg);color:var(--admin);border:1px solid var(--admin-border);font-size:.6875rem;font-weight:700;padding:.125rem .375rem;border-radius:99px}
+    .sidebar-footer{margin-top:auto;border-top:1px solid var(--border);padding:.625rem}
+    .sidebar-footer-item{display:flex;align-items:center;gap:.5625rem;padding:.4rem .5rem;border-radius:var(--radius-md);color:var(--text-600);font-size:.8125rem;cursor:pointer;transition:background .12s;text-decoration:none}
+    .sidebar-footer-item:hover{background:var(--bg);color:var(--text-900)}
+    .sidebar-footer-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+
+    /* ─── CONTENT ─── */
+    .content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+    .page-header{background:var(--surface);border-bottom:1px solid var(--border);padding:.875rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-shrink:0}
+    .page-title{font-size:1.0625rem;font-weight:700;letter-spacing:-.02em}
+    .page-breadcrumb{font-size:.75rem;color:var(--text-600);margin-top:.125rem;display:flex;align-items:center;gap:.3125rem}
+    .bc-sep{opacity:.4}
+    .page-actions{display:flex;align-items:center;gap:.4375rem}
+    .btn{display:flex;align-items:center;gap:.375rem;padding:.4375rem .875rem;border-radius:var(--radius-md);font-family:'Inter',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;border:none;transition:background .15s}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .btn-secondary{background:var(--bg);color:var(--text-600);border:1.5px solid var(--border)}
+    .btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+    .btn svg{width:14px;height:14px}
+
+    /* Filter strip */
+    .filter-strip{background:var(--surface);border-bottom:1px solid var(--border);padding:.625rem 1.5rem;display:flex;align-items:center;gap:.625rem;flex-shrink:0;flex-wrap:wrap}
+    .search-box{display:flex;align-items:center;gap:.5rem;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:.375rem .625rem;width:240px}
+    .search-box:focus-within{border-color:var(--primary)}
+    .search-box input{border:none;background:transparent;font-family:'Inter',sans-serif;font-size:.875rem;color:var(--text-900);outline:none;width:100%}
+    .search-box svg{color:var(--text-400);flex-shrink:0;width:14px;height:14px}
+    .filter-tabs{display:flex;gap:2px;background:var(--bg);border-radius:calc(var(--radius-md) + 2px);padding:2px;border:1.5px solid var(--border)}
+    .filter-tab{padding:.3125rem .75rem;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:.8125rem;font-weight:500;cursor:pointer;color:var(--text-600);transition:background .12s,color .12s;border:none;background:transparent;display:flex;align-items:center;gap:.375rem}
+    .filter-tab.active{background:var(--surface);color:var(--text-900);box-shadow:var(--shadow-sm)}
+    .filter-count{font-size:.6875rem;color:var(--text-400)}
+    .filter-tab.active .filter-count{color:var(--text-600)}
+    .filter-spacer{flex:1}
+    .plan-select{padding:.375rem .625rem;border:1.5px solid var(--border);border-radius:var(--radius-md);font-family:'Inter',sans-serif;font-size:.8125rem;color:var(--text-600);background:var(--surface);outline:none;cursor:pointer}
+    .plan-select:focus{border-color:var(--primary)}
+
+    /* Table */
+    .content-inner{padding:1.25rem 1.5rem;flex:1}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+    .card-header{padding:.75rem 1.125rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .card-title{font-size:.9375rem;font-weight:600}
+    .card-sub{font-size:.8125rem;color:var(--text-600)}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:.875rem}
+    thead th{text-align:left;padding:.5625rem .875rem;font-size:.6875rem;font-weight:600;color:var(--text-600);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);white-space:nowrap}
+    thead th.sortable{cursor:pointer;user-select:none}
+    thead th.sortable:hover{color:var(--text-900)}
+    tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:var(--bg)}
+    td{padding:.625rem .875rem;vertical-align:middle}
+    .vendor-logo-sm{width:32px;height:32px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;border:1px solid var(--border)}
+    .vendor-name-cell{display:flex;align-items:center;gap:.625rem}
+    .vendor-row-name{font-weight:600;font-size:.9rem}
+    .vendor-row-meta{font-size:.75rem;color:var(--text-600)}
+    .chip{display:inline-flex;align-items:center;padding:.1875rem .5rem;border-radius:99px;font-size:.75rem;font-weight:600}
+    .chip-green{background:#d1fae5;color:#047857}
+    .chip-yellow{background:#fef3c7;color:#d97706}
+    .chip-blue{background:#dbeafe;color:#1d4ed8}
+    .chip-red{background:#fee2e2;color:#b91c1c}
+    .chip-gray{background:#f1f5f9;color:#475569}
+    .plan-starter{background:#F1F5F9;color:#475569}
+    .plan-growth{background:#EFF6FF;color:#1E40AF}
+    .plan-enterprise{background:#F5F3FF;color:#5B21B6}
+    .text-right{text-align:right}
+    .row-actions{display:flex;align-items:center;gap:.375rem;opacity:0;transition:opacity .15s}
+    tbody tr:hover .row-actions{opacity:1}
+    .action-btn{width:26px;height:26px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-600);transition:border-color .12s,background .12s}
+    .action-btn:hover{border-color:var(--primary);background:var(--primary-light);color:var(--primary-dark)}
+    .action-btn svg{width:12px;height:12px}
+    .action-btn-danger:hover{border-color:#FCA5A5;background:#FEF2F2;color:var(--admin)}
+
+    /* Pagination */
+    .pagination{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.125rem;border-top:1px solid var(--border)}
+    .page-info{font-size:.8125rem;color:var(--text-600)}
+    .page-btns{display:flex;gap:.375rem}
+    .page-btn{width:28px;height:28px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:.8125rem;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;color:var(--text-600);transition:border-color .12s,background .12s}
+    .page-btn:hover{border-color:var(--primary);color:var(--primary)}
+    .page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+    .page-btn-text{padding:0 .625rem;width:auto}
+  </style>
+</head>
+<body>
+
+<!-- ═══ TOPNAV ═══ -->
+<header class="topnav">
+  <div class="topnav-left">
+    <a href="../launcher.html" class="brand">
+      <div class="brand-icon">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+      </div>
+      <span class="brand-name">App<em>In</em>App</span>
+    </a>
+    <div class="divider-v"></div>
+    <div class="admin-badge">
+      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      ADMIN CONSOLE
+    </div>
+  </div>
+  <div class="topnav-right">
+    <button class="icon-btn" title="Global search">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+    </button>
+    <div class="badge-wrap">
+      <button class="icon-btn" title="Alerts">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+      </button>
+      <div class="badge">5</div>
+    </div>
+    <div class="divider-v"></div>
+    <span class="avatar-label">Super Admin</span>
+    <div class="avatar">SA</div>
+  </div>
+</header>
+
+<!-- ═══ BODY ═══ -->
+<div class="body-wrap">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+    <div class="sidebar-admin-header">
+      <div class="sidebar-admin-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      </div>
+      <div>
+        <div class="sidebar-admin-name">Admin Console</div>
+        <div class="sidebar-admin-sub">AppInApp Platform</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">Platform</div>
+    <a class="nav-item" href="dashboard.html">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+        Dashboard
+      </div>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+        Analytics
+      </div>
+    </a>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">Management</div>
+    <a class="nav-item active" href="vendors.html">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>
+        Vendors
+      </div>
+      <span class="nav-badge-gray">142</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+        Businesses
+      </div>
+      <span class="nav-badge-gray">387</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+        Users
+      </div>
+      <span class="nav-badge-gray">1.2K</span>
+    </a>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">System</div>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+        Billing
+      </div>
+      <span class="nav-badge-red">2</span>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Settings
+      </div>
+    </a>
+    <a class="nav-item" href="#">
+      <div class="nav-item-left">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/></svg>
+        Audit Log
+      </div>
+    </a>
+    <div class="sidebar-footer">
+      <a class="sidebar-footer-item" href="../launcher.html">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+        Exit Admin
+      </a>
+    </div>
+  </aside>
+
+  <!-- ─── CONTENT ─── -->
+  <main class="content">
+    <!-- Page header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Vendors</div>
+        <div class="page-breadcrumb">
+          <a href="dashboard.html" style="color:var(--text-600);text-decoration:none">Admin</a>
+          <span class="bc-sep">›</span>
+          <span>Vendors</span>
+          <span class="bc-sep">·</span>
+          <span style="color:var(--text-400)">142 total</span>
+        </div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+          Export CSV
+        </button>
+        <button class="btn btn-primary" onclick="window.location.href='vendor-detail.html'">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Add Vendor
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter strip -->
+    <div class="filter-strip">
+      <div class="search-box">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+        <input type="text" placeholder="Search vendors..." id="searchInput" oninput="filterVendors()"/>
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter('all', this)">All <span class="filter-count">142</span></button>
+        <button class="filter-tab" onclick="setFilter('active', this)">Active <span class="filter-count">118</span></button>
+        <button class="filter-tab" onclick="setFilter('trial', this)">Trial <span class="filter-count">19</span></button>
+        <button class="filter-tab" onclick="setFilter('suspended', this)">Suspended <span class="filter-count">5</span></button>
+      </div>
+      <select class="plan-select" onchange="filterVendors()">
+        <option value="">All Plans</option>
+        <option value="starter">Starter</option>
+        <option value="growth">Growth</option>
+        <option value="enterprise">Enterprise</option>
+      </select>
+      <div class="filter-spacer"></div>
+      <span style="font-size:.8125rem;color:var(--text-600)">Showing <strong>10</strong> of 142</span>
+    </div>
+
+    <!-- Table -->
+    <div class="content-inner">
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="sortable">Vendor ↕</th>
+                <th>Status</th>
+                <th>Plan</th>
+                <th>Businesses</th>
+                <th>Branches</th>
+                <th class="sortable">GMV (30d) ↕</th>
+                <th>Users</th>
+                <th class="sortable">Joined ↕</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="vendorTable">
+              <tr onclick="window.location.href='vendor-detail.html'">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#FEF3C7;color:#D97706">PH</div>
+                    <div>
+                      <div class="vendor-row-name">Prestige Hotels</div>
+                      <div class="vendor-row-meta">Nairobi · prestige-hotels</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-green">Active</span></td>
+                <td><span class="chip plan-enterprise">Enterprise</span></td>
+                <td>4</td><td>18</td>
+                <td style="font-weight:600">KES 623K</td>
+                <td>89</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Jan 5, 2024</td>
+                <td>
+                  <div class="row-actions">
+                    <button class="action-btn" title="View detail" onclick="event.stopPropagation();window.location.href='vendor-detail.html'">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="action-btn" title="Impersonate" onclick="event.stopPropagation();impersonate('prestige-hotels','Prestige Hotels')">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                    </button>
+                    <button class="action-btn action-btn-danger" title="Suspend" onclick="event.stopPropagation()">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr onclick="window.location.href='vendor-detail.html'">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#DCFCE7;color:#16A34A">JH</div>
+                    <div>
+                      <div class="vendor-row-name">Johari Holdings</div>
+                      <div class="vendor-row-meta">Nairobi · johari-holdings</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-green">Active</span></td>
+                <td><span class="chip plan-enterprise">Enterprise</span></td>
+                <td>3</td><td>7</td>
+                <td style="font-weight:600">KES 486K</td>
+                <td>47</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Jan 14, 2024</td>
+                <td>
+                  <div class="row-actions">
+                    <button class="action-btn" title="View detail" onclick="event.stopPropagation();window.location.href='vendor-detail.html'">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="action-btn" title="Impersonate" onclick="event.stopPropagation();impersonate('johari-holdings','Johari Holdings')">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                    </button>
+                    <button class="action-btn action-btn-danger" title="Suspend" onclick="event.stopPropagation()">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr onclick="window.location.href='vendor-detail.html'">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#EFF6FF;color:#1D4ED8">SG</div>
+                    <div>
+                      <div class="vendor-row-name">Savannah Group</div>
+                      <div class="vendor-row-meta">Nairobi · savannah-group</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-green">Active</span></td>
+                <td><span class="chip plan-growth">Growth</span></td>
+                <td>2</td><td>5</td>
+                <td style="font-weight:600">KES 284K</td>
+                <td>23</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Mar 2, 2024</td>
+                <td><div class="row-actions"><button class="action-btn" onclick="event.stopPropagation();window.location.href='vendor-detail.html'"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button><button class="action-btn" onclick="event.stopPropagation();impersonate('savannah-group','Savannah Group')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></button><button class="action-btn action-btn-danger" onclick="event.stopPropagation()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button></div></td>
+              </tr>
+              <tr onclick="window.location.href='vendor-detail.html'">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#FEF9C3;color:#A16207">MR</div>
+                    <div>
+                      <div class="vendor-row-name">Mombasa Rides</div>
+                      <div class="vendor-row-meta">Mombasa · mombasa-rides</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-green">Active</span></td>
+                <td><span class="chip plan-growth">Growth</span></td>
+                <td>2</td><td>4</td>
+                <td style="font-weight:600">KES 198K</td>
+                <td>31</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Apr 18, 2024</td>
+                <td><div class="row-actions"><button class="action-btn" onclick="event.stopPropagation();window.location.href='vendor-detail.html'"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button><button class="action-btn" onclick="event.stopPropagation();impersonate('mombasa-rides','Mombasa Rides')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></button><button class="action-btn action-btn-danger" onclick="event.stopPropagation()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button></div></td>
+              </tr>
+              <tr onclick="window.location.href='vendor-detail.html'">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#FCE7F3;color:#BE185D">UE</div>
+                    <div>
+                      <div class="vendor-row-name">Urban Eats Kenya</div>
+                      <div class="vendor-row-meta">Nairobi · urban-eats-ke</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-green">Active</span></td>
+                <td><span class="chip plan-growth">Growth</span></td>
+                <td>1</td><td>3</td>
+                <td style="font-weight:600">KES 134K</td>
+                <td>18</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Jun 9, 2024</td>
+                <td><div class="row-actions"><button class="action-btn" onclick="event.stopPropagation();window.location.href='vendor-detail.html'"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button><button class="action-btn" onclick="event.stopPropagation();impersonate('urban-eats-ke','Urban Eats Kenya')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></button><button class="action-btn action-btn-danger" onclick="event.stopPropagation()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button></div></td>
+              </tr>
+              <tr onclick="window.location.href='vendor-detail.html'">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#F3F4F6;color:#374151">NF</div>
+                    <div>
+                      <div class="vendor-row-name">Nairobi Fresh</div>
+                      <div class="vendor-row-meta">Nairobi · nairobi-fresh</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-green">Active</span></td>
+                <td><span class="chip plan-starter">Starter</span></td>
+                <td>1</td><td>2</td>
+                <td style="font-weight:600">KES 89K</td>
+                <td>14</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Aug 30, 2024</td>
+                <td><div class="row-actions"><button class="action-btn" onclick="event.stopPropagation();window.location.href='vendor-detail.html'"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button><button class="action-btn" onclick="event.stopPropagation();impersonate('nairobi-fresh','Nairobi Fresh')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></button><button class="action-btn action-btn-danger" onclick="event.stopPropagation()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button></div></td>
+              </tr>
+              <tr onclick="window.location.href='vendor-detail.html'">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#F3E8FF;color:#7C3AED">JM</div>
+                    <div>
+                      <div class="vendor-row-name">The Junction Mall</div>
+                      <div class="vendor-row-meta">Nairobi · junction-mall</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-yellow">Trial</span></td>
+                <td><span class="chip plan-enterprise">Enterprise</span></td>
+                <td>5</td><td>12</td>
+                <td style="font-weight:600">KES 124K</td>
+                <td>67</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Mar 4, 2026</td>
+                <td><div class="row-actions"><button class="action-btn" onclick="event.stopPropagation();window.location.href='vendor-detail.html'"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button><button class="action-btn" onclick="event.stopPropagation();impersonate('junction-mall','The Junction Mall')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></button><button class="action-btn action-btn-danger" onclick="event.stopPropagation()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button></div></td>
+              </tr>
+              <tr onclick="window.location.href='vendor-detail.html'">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#EFF6FF;color:#1E40AF">WB</div>
+                    <div>
+                      <div class="vendor-row-name">Westlands Bistro</div>
+                      <div class="vendor-row-meta">Nairobi · westlands-bistro</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-yellow">Trial</span></td>
+                <td><span class="chip plan-starter">Starter</span></td>
+                <td>1</td><td>1</td>
+                <td style="font-weight:600">KES 47K</td>
+                <td>8</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Feb 24, 2026</td>
+                <td><div class="row-actions"><button class="action-btn" onclick="event.stopPropagation();window.location.href='vendor-detail.html'"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button><button class="action-btn" onclick="event.stopPropagation();impersonate('westlands-bistro','Westlands Bistro')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></button><button class="action-btn action-btn-danger" onclick="event.stopPropagation()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button></div></td>
+              </tr>
+              <tr onclick="window.location.href='vendor-detail.html'" style="opacity:.6">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#F9F9F9;color:#9CA3AF">SC</div>
+                    <div>
+                      <div class="vendor-row-name">Safari Catering</div>
+                      <div class="vendor-row-meta">Nairobi · safari-catering</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-red">Suspended</span></td>
+                <td><span class="chip plan-growth">Growth</span></td>
+                <td>1</td><td>2</td>
+                <td style="font-weight:600;color:var(--text-400)">KES 0</td>
+                <td>9</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Sep 12, 2024</td>
+                <td><div class="row-actions"><button class="action-btn" onclick="event.stopPropagation();window.location.href='vendor-detail.html'"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button><button class="action-btn" style="color:#16A34A;border-color:#BBF7D0" onclick="event.stopPropagation()" title="Reactivate"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg></button></div></td>
+              </tr>
+              <tr onclick="window.location.href='vendor-detail.html'">
+                <td>
+                  <div class="vendor-name-cell">
+                    <div class="vendor-logo-sm" style="background:#F0FDF4;color:#15803D">KF</div>
+                    <div>
+                      <div class="vendor-row-name">Kikuyu Farms</div>
+                      <div class="vendor-row-meta">Kiambu · kikuyu-farms</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="chip chip-green">Active</span></td>
+                <td><span class="chip plan-starter">Starter</span></td>
+                <td>1</td><td>1</td>
+                <td style="font-weight:600">KES 44K</td>
+                <td>6</td>
+                <td style="color:var(--text-600);font-size:.8125rem">Mar 8, 2026</td>
+                <td><div class="row-actions"><button class="action-btn" onclick="event.stopPropagation();window.location.href='vendor-detail.html'"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button><button class="action-btn" onclick="event.stopPropagation();impersonate('kikuyu-farms','Kikuyu Farms')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></button><button class="action-btn action-btn-danger" onclick="event.stopPropagation()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="page-info">Showing 1–10 of 142 vendors</span>
+          <div class="page-btns">
+            <button class="page-btn page-btn-text" disabled style="opacity:.4">← Prev</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span style="padding:0 .25rem;color:var(--text-400);font-size:.8125rem">...</span>
+            <button class="page-btn">15</button>
+            <button class="page-btn page-btn-text">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function setFilter(filter, btn){
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+function filterVendors(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('#vendorTable tr').forEach(row=>{
+    const name = row.querySelector('.vendor-row-name')?.textContent.toLowerCase()||'';
+    row.style.display = name.includes(q) ? '' : 'none';
+  });
+}
+function impersonate(vendorId, vendorName){
+  sessionStorage.setItem('impersonating', 'true');
+  sessionStorage.setItem('impersonateVendorId', vendorId);
+  sessionStorage.setItem('impersonateVendorName', vendorName);
+  sessionStorage.setItem('role', 'vendor-admin');
+  window.location.href = '../launcher.html';
+}
+</script>
+</body>
+</html>
