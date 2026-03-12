@@ -238,19 +238,39 @@
     .role-branchadmin{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}
     .role-supplier{background:#fdf4ff;border-color:#d8b4fe;color:#7c3aed}
 
+    /* ── launcher management tab (admin only) ── */
+    .launcher-tabs{border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:58px;z-index:100;display:none}
+    .launcher-tabs-inner{max-width:1160px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:flex-end;gap:0}
+    .ltab{padding:.625rem .875rem;font-size:.9rem;font-weight:500;color:var(--text-600);cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s}
+    .ltab:hover{color:var(--text-900)}
+    .ltab.active{color:var(--primary-dark);border-bottom-color:var(--primary)}
+    body.role-superadmin .launcher-tabs{display:block}
+
     /* hidden by role */
     .for-vendor{display:none}
     .for-superadmin{display:none}
     .for-branch{display:none}
     .for-supplier{display:none}
+    /* apps section: shown to vendor-admin, superadmin, branch-admin, supplier */
+    .for-apps{display:none}
     body.role-vendor-admin .for-vendor{display:block}
-    body.role-vendor-admin .for-superadmin{display:none}
-    body.role-vendor-admin .for-branch{display:none}
+    body.role-vendor-admin .for-apps{display:block}
     body.role-superadmin .for-superadmin{display:block}
-    body.role-superadmin .for-vendor{display:none}
-    body.role-superadmin .for-branch{display:none}
+    body.role-superadmin .for-apps{display:block}
     body.role-branch-admin .for-branch{display:block}
-    body.role-branch-admin .for-vendor{display:none}
+    body.role-branch-admin .for-apps{display:block}
+    body.role-supplier .for-supplier{display:block}
+    body.role-supplier .for-apps{display:block}
+    /* app cards scoped by role */
+    .ac-vendor{display:none}
+    .ac-admin{display:none}
+    .ac-branch{display:none}
+    .ac-supplier{display:none}
+    body.role-vendor-admin .ac-vendor{display:block}
+    body.role-superadmin .ac-vendor{display:block}
+    body.role-superadmin .ac-admin{display:block}
+    body.role-branch-admin .ac-branch{display:block}
+    body.role-supplier .ac-supplier{display:block}
 
     /* ── Impersonation banner ── */
     .imper-banner{display:none;position:sticky;top:0;z-index:300;background:#EA580C;color:#fff;font-size:.8125rem;font-weight:500;padding:.5rem 1.5rem;align-items:center;justify-content:space-between;gap:.75rem}
@@ -260,6 +280,10 @@
     .imper-banner strong{font-weight:700}
     .imper-exit{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;font-family:'Inter',sans-serif;font-size:.8125rem;font-weight:600;padding:.25rem .75rem;border-radius:99px;cursor:pointer;transition:background .15s;white-space:nowrap}
     .imper-exit:hover{background:rgba(255,255,255,.3)}
+    /* ── supplier app card ── */
+    .supply-badge{font-size:.6875rem;font-weight:600;padding:.125rem .4375rem;border-radius:99px;background:#F5F3FF;color:#5B21B6;border:1px solid #DDD6FE}
+    .supply-products{font-size:.75rem;color:var(--text-600);margin-top:.25rem;display:flex;flex-wrap:wrap;gap:.3125rem}
+    .supply-product-pill{background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:.125rem .5rem;font-size:.6875rem}
   </style>
 </head>
 <body class="role-vendor-admin">
@@ -317,6 +341,14 @@
   </div>
 </header>
 
+<!-- ── Admin launcher tabs ── -->
+<div class="launcher-tabs">
+  <div class="launcher-tabs-inner">
+    <button class="ltab active" onclick="switchLauncherTab('apps',this)">Apps</button>
+    <button class="ltab" onclick="switchLauncherTab('management',this)">Management</button>
+  </div>
+</div>
+
 <!-- ───── BODY ───── -->
 <main class="body">
 
@@ -348,7 +380,7 @@
   <div class="for-vendor">
 
     <!-- Stats -->
-    <div class="sh"><span class="sh-title">Today across all businesses</span><span class="sh-sub">Updated just now</span></div>
+    <div class="sh"><span class="sh-title">Today across all apps</span><span class="sh-sub">Updated just now</span></div>
     <div class="stats-grid" style="margin-bottom:2.5rem">
       <div class="stat"><div class="stat-label">Total Revenue</div><div class="stat-val">KES 148,720</div><div class="stat-delta up">↑ 14% vs yesterday</div></div>
       <div class="stat"><div class="stat-label">Total Orders</div><div class="stat-val">284</div><div class="stat-delta up">↑ 22 this hour</div></div>
@@ -357,15 +389,73 @@
       <div class="stat"><div class="stat-label">Avg Rating</div><div class="stat-val">4.5 ★</div><div class="stat-delta up">↑ 0.1 this week</div></div>
     </div>
 
-    <!-- Businesses grid -->
+    <!-- Apps grid header (only shown when vendor stats visible) -->
+  </div><!-- /for-vendor -->
+
+  <!-- ══════════════ BRANCH ADMIN VIEW ══════════════ -->
+  <div class="for-branch">
+    <div class="sh"><span class="sh-title">Kilimani Main — Today</span><span class="sh-sub">Restaurant · Open now</span></div>
+    <div class="stats-grid" style="margin-bottom:2.5rem">
+      <div class="stat"><div class="stat-label">Revenue</div><div class="stat-val">KES 37,400</div><div class="stat-delta up">↑ 9% vs yesterday</div></div>
+      <div class="stat"><div class="stat-label">Orders</div><div class="stat-val">64</div><div class="stat-delta up">↑ 5 this hour</div></div>
+      <div class="stat"><div class="stat-label">Tables</div><div class="stat-val">18 / 32</div><div class="stat-delta neu">56% occupied</div></div>
+      <div class="stat"><div class="stat-label">Kitchen Queue</div><div class="stat-val">6</div><div class="stat-delta dn">2 delayed</div></div>
+    </div>
+  </div><!-- /for-branch -->
+
+  <!-- ══════════════ SUPER ADMIN VIEW — stats only ══════════════ -->
+  <div class="for-superadmin" id="admin-apps-section">
+    <div class="sh"><span class="sh-title">Platform today</span><span class="sh-sub">All vendors · live</span></div>
+    <div class="stats-grid" style="margin-bottom:2.5rem">
+      <div class="stat"><div class="stat-label">Platform Revenue</div><div class="stat-val">KES 4.2M</div><div class="stat-delta up">↑ 8% MTD</div></div>
+      <div class="stat"><div class="stat-label">Active Vendors</div><div class="stat-val">128</div><div class="stat-delta up">↑ 4 this week</div></div>
+      <div class="stat"><div class="stat-label">Total Branches</div><div class="stat-val">394</div><div class="stat-delta neu">+6 pending</div></div>
+      <div class="stat"><div class="stat-label">Orders Today</div><div class="stat-val">5,831</div><div class="stat-delta up">↑ 12%</div></div>
+      <div class="stat"><div class="stat-label">Platform Uptime</div><div class="stat-val">99.97%</div><div class="stat-delta up">All systems go</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SUPPLIER VIEW — stats ══════════════ -->
+  <div class="for-supplier">
+    <div class="sh"><span class="sh-title">Your supply activity</span><span class="sh-sub">Across all partner vendors</span></div>
+    <div class="stats-grid" style="margin-bottom:2.5rem">
+      <div class="stat"><div class="stat-label">Open POs</div><div class="stat-val">14</div><div class="stat-delta neu">3 pending confirmation</div></div>
+      <div class="stat"><div class="stat-label">Deliveries Today</div><div class="stat-val">6</div><div class="stat-delta up">↑ 2 vs tomorrow forecast</div></div>
+      <div class="stat"><div class="stat-label">Revenue (30d)</div><div class="stat-val">KES 284K</div><div class="stat-delta up">↑ 11%</div></div>
+      <div class="stat"><div class="stat-label">Partner Vendors</div><div class="stat-val">8</div><div class="stat-delta neu">2 locations pending</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ APPS SECTION — ALL ROLES ══════════════ -->
+  <div class="for-apps" id="launcher-apps">
     <div class="sh">
-      <span class="sh-title">Your businesses</span>
-      <button class="sh-action">+ Add business</button>
+      <span class="sh-title" id="appsLabel">Your apps</span>
+      <button class="sh-action ac-vendor" onclick="">+ Add app</button>
     </div>
     <div class="biz-grid" id="bizGrid">
 
+      <!-- Admin Console app card (admin only) -->
+      <div class="ac-admin biz-card" style="--c:#DC2626;--ic-bg:#FEF2F2;--ic:#B91C1C" onclick="window.location.href='admin/dashboard.html'">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top">
+            <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg></div>
+          </div>
+          <div>
+            <div class="biz-type" style="color:#DC2626">Admin</div>
+            <div class="biz-name">Admin Console</div>
+            <div class="biz-desc" style="margin-top:.25rem">Vendor management, billing oversight &amp; platform health</div>
+          </div>
+        </div>
+        <div class="biz-footer">
+          <span class="biz-branches" style="color:#DC2626;font-weight:600">2 alerts</span>
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+        </div>
+      </div>
+
+      <!-- Business app cards (vendor admin + superadmin) -->
       <!-- Restaurant -->
-      <div class="biz-card" id="biz-restaurant" style="--c:#65A694;--ic-bg:#E6F0EE;--ic:#47766C" onclick="toggleBiz('restaurant')">
+      <div class="ac-vendor biz-card" id="biz-restaurant" style="--c:#65A694;--ic-bg:#E6F0EE;--ic:#47766C" onclick="toggleBiz('restaurant')">
         <div class="biz-stripe"></div>
         <div class="biz-main">
           <div class="biz-top">
@@ -435,7 +525,7 @@
       </div>
 
       <!-- Car Rental -->
-      <div class="biz-card" id="biz-car" style="--c:#0ea5e9;--ic-bg:#e0f2fe;--ic:#0369a1" onclick="toggleBiz('car')">
+      <div class="ac-vendor biz-card" id="biz-car" style="--c:#0ea5e9;--ic-bg:#e0f2fe;--ic:#0369a1" onclick="toggleBiz('car')">
         <div class="biz-stripe"></div>
         <div class="biz-main">
           <div class="biz-top">
@@ -496,7 +586,7 @@
       </div>
 
       <!-- Logistics -->
-      <div class="biz-card" id="biz-logistics" style="--c:#f97316;--ic-bg:#ffedd5;--ic:#c2410c" onclick="toggleBiz('logistics')">
+      <div class="ac-vendor biz-card" id="biz-logistics" style="--c:#f97316;--ic-bg:#ffedd5;--ic:#c2410c" onclick="toggleBiz('logistics')">
         <div class="biz-stripe"></div>
         <div class="biz-main">
           <div class="biz-top">
@@ -553,8 +643,100 @@
         </div>
       </div>
 
-    </div><!-- /biz-grid -->
+      <!-- Branch Admin module cards (branch admin sees modules as apps) -->
+      <div class="ac-branch biz-card" style="--c:#65A694;--ic-bg:#E6F0EE;--ic:#47766C;cursor:pointer" onclick="goTo('orders','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top"><div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg></div><span class="biz-badge">12</span></div>
+          <div><div class="biz-type">Your Branch</div><div class="biz-name">Orders</div><div class="biz-desc" style="margin-top:.25rem">Live orders, history &amp; fulfilment — Kilimani Main</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">12 live</span></div>
+      </div>
+      <div class="ac-branch biz-card" style="--c:#f59e0b;--ic-bg:#fef3c7;--ic:#d97706;cursor:pointer" onclick="goTo('menu','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top"><div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25v14.25"/></svg></div></div>
+          <div><div class="biz-type">Your Branch</div><div class="biz-name">Menu</div><div class="biz-desc" style="margin-top:.25rem">Products &amp; pricing — 124 items active</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches">124 items</span></div>
+      </div>
+      <div class="ac-branch biz-card" style="--c:#8b5cf6;--ic-bg:#ede9fe;--ic:#7c3aed;cursor:pointer" onclick="goTo('reservations','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top"><div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5"/></svg></div></div>
+          <div><div class="biz-type">Your Branch</div><div class="biz-name">Reservations</div><div class="biz-desc" style="margin-top:.25rem">Bookings &amp; calendar</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">3 tonight</span></div>
+      </div>
+      <div class="ac-branch biz-card" style="--c:#f97316;--ic-bg:#ffedd5;--ic:#c2410c;cursor:pointer" onclick="goTo('delivery','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top"><div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6"/></svg></div></div>
+          <div><div class="biz-type">Your Branch</div><div class="biz-name">Delivery</div><div class="biz-desc" style="margin-top:.25rem">Riders &amp; dispatches</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches">6 active</span></div>
+      </div>
+      <div class="ac-branch biz-card" style="--c:#6366f1;--ic-bg:#e0e7ff;--ic:#4338ca;cursor:pointer" onclick="goTo('staff','restaurant')">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top"><div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg></div></div>
+          <div><div class="biz-type">Your Branch</div><div class="biz-name">Staff</div><div class="biz-desc" style="margin-top:.25rem">Roster, shifts &amp; tasks</div></div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">5 tasks</span></div>
+      </div>
 
+      <!-- Supplier app cards (supplier sees their supply partner businesses) -->
+      <div class="ac-supplier biz-card" style="--c:#7C3AED;--ic-bg:#F5F3FF;--ic:#5B21B6" onclick="">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top">
+            <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25v14.25"/></svg></div>
+            <span class="supply-badge">Restaurant</span>
+          </div>
+          <div>
+            <div class="biz-type" style="color:#7C3AED">Supply Partner</div>
+            <div class="biz-name">Kilimani Grill</div>
+            <div class="supply-products"><span class="supply-product-pill">Tusker Lager</span><span class="supply-product-pill">Pilsner Urquell</span><span class="supply-product-pill">White Cap</span></div>
+          </div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches">3 open POs · KES 84K pending</span></div>
+      </div>
+      <div class="ac-supplier biz-card" style="--c:#7C3AED;--ic-bg:#F5F3FF;--ic:#5B21B6" onclick="">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top">
+            <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25v14.25"/></svg></div>
+            <span class="supply-badge">Restaurant</span>
+          </div>
+          <div>
+            <div class="biz-type" style="color:#7C3AED">Supply Partner</div>
+            <div class="biz-name">Nairobi Flavours</div>
+            <div class="supply-products"><span class="supply-product-pill">Tusker Lager</span><span class="supply-product-pill">Guinness</span></div>
+          </div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches">1 open PO · KES 34K pending</span></div>
+      </div>
+      <div class="ac-supplier biz-card" style="--c:#0ea5e9;--ic-bg:#e0f2fe;--ic:#0369a1" onclick="">
+        <div class="biz-stripe"></div>
+        <div class="biz-main">
+          <div class="biz-top">
+            <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18"/></svg></div>
+            <span class="supply-badge">Hotel</span>
+          </div>
+          <div>
+            <div class="biz-type" style="color:#0ea5e9">Supply Partner</div>
+            <div class="biz-name">Prestige Hotels Bar</div>
+            <div class="supply-products"><span class="supply-product-pill">Heineken</span><span class="supply-product-pill">Tusker Malt</span><span class="supply-product-pill">Red Bull</span></div>
+          </div>
+        </div>
+        <div class="biz-footer"><span class="biz-branches">Confirmed for Fri · KES 62K</span></div>
+      </div>
+
+    </div><!-- /biz-grid -->
+  </div><!-- /for-apps -->
+
+  <!-- ══════════════ BRANCHES + RECENTLY USED (vendor + admin) ══════════════ -->
+  <div class="for-vendor">
     <!-- Branches section -->
     <div class="sh">
       <span class="sh-title">Your branches</span>
@@ -643,22 +825,20 @@
       </div>
     </div>
 
-  </div><!-- /for-vendor -->
+  </div><!-- /for-vendor (branches + recently used) -->
 
-  <!-- ══════════════ SUPER ADMIN VIEW ══════════════ -->
-  <div class="for-superadmin">
+  <!-- ══════════════ SUPER ADMIN — MANAGEMENT TAB ══════════════ -->
+  <div class="for-superadmin" id="launcher-management" style="display:none">
 
-    <!-- Platform stats -->
-    <div class="sh"><span class="sh-title">Platform overview</span><span class="sh-sub">All vendors · live</span></div>
-    <div class="stats-grid" style="margin-bottom:2.5rem">
-      <div class="stat"><div class="stat-label">Platform Revenue</div><div class="stat-val">KES 4.2M</div><div class="stat-delta up">↑ 8% MTD</div></div>
+    <div class="sh"><span class="sh-title">Platform Management</span><button class="sh-action" onclick="window.location.href='admin/dashboard.html'">Open Admin Console →</button></div>
+    <div class="stats-grid" style="margin-bottom:2rem">
       <div class="stat"><div class="stat-label">Active Vendors</div><div class="stat-val">128</div><div class="stat-delta up">↑ 4 this week</div></div>
       <div class="stat"><div class="stat-label">Total Branches</div><div class="stat-val">394</div><div class="stat-delta neu">+6 pending</div></div>
       <div class="stat"><div class="stat-label">Orders Today</div><div class="stat-val">5,831</div><div class="stat-delta up">↑ 12%</div></div>
-      <div class="stat"><div class="stat-label">Platform Uptime</div><div class="stat-val">99.97%</div><div class="stat-delta up">All systems go</div></div>
+      <div class="stat"><div class="stat-label">Billing Alerts</div><div class="stat-val" style="color:#DC2626">2</div><div class="stat-delta dn">Overdue invoices</div></div>
     </div>
 
-    <div class="sh"><span class="sh-title">Vendors</span><button class="sh-action">+ Onboard vendor</button></div>
+    <div class="sh"><span class="sh-title">Vendors</span><button class="sh-action" onclick="window.location.href='admin/vendors.html'">View all 142 →</button></div>
     <div class="vendor-grid">
       <div class="vendor-card" onclick="drillVendor('johari')">
         <div class="vendor-avatar">JH</div>
@@ -726,73 +906,7 @@
       </div>
     </div>
 
-  </div><!-- /for-superadmin -->
-
-  <!-- ══════════════ BRANCH ADMIN VIEW ══════════════ -->
-  <div class="for-branch">
-
-    <div class="sh"><span class="sh-title">Kilimani Main — Today</span><span class="sh-sub">Restaurant · Open now</span></div>
-    <div class="stats-grid" style="margin-bottom:2.5rem">
-      <div class="stat"><div class="stat-label">Revenue</div><div class="stat-val">KES 37,400</div><div class="stat-delta up">↑ 9% vs yesterday</div></div>
-      <div class="stat"><div class="stat-label">Orders</div><div class="stat-val">64</div><div class="stat-delta up">↑ 5 this hour</div></div>
-      <div class="stat"><div class="stat-label">Tables</div><div class="stat-val">18 / 32</div><div class="stat-delta neu">56% occupied</div></div>
-      <div class="stat"><div class="stat-label">Kitchen Queue</div><div class="stat-val">6</div><div class="stat-delta dn">2 delayed</div></div>
-    </div>
-
-    <div class="sh"><span class="sh-title">Modules — Kilimani Grill</span></div>
-    <div class="biz-grid" style="grid-template-columns:repeat(auto-fill,minmax(190px,1fr))">
-      <div class="biz-card" style="--c:#65A694;--ic-bg:#E6F0EE;--ic:#47766C;cursor:pointer" onclick="goTo('orders','restaurant')">
-        <div class="biz-stripe"></div>
-        <div class="biz-main">
-          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg></div>
-          <div><div class="biz-name">Orders</div><div class="biz-desc" style="margin-top:.25rem">Live, history &amp; fulfilment</div></div>
-        </div>
-        <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">12 live</span></div>
-      </div>
-      <div class="biz-card" style="--c:#f59e0b;--ic-bg:#fef3c7;--ic:#d97706;cursor:pointer" onclick="goTo('menu','restaurant')">
-        <div class="biz-stripe"></div>
-        <div class="biz-main">
-          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25v14.25"/></svg></div>
-          <div><div class="biz-name">Menu</div><div class="biz-desc" style="margin-top:.25rem">Products &amp; pricing</div></div>
-        </div>
-        <div class="biz-footer"><span class="biz-branches">124 items</span></div>
-      </div>
-      <div class="biz-card" style="--c:#8b5cf6;--ic-bg:#ede9fe;--ic:#7c3aed;cursor:pointer" onclick="goTo('reservations','restaurant')">
-        <div class="biz-stripe"></div>
-        <div class="biz-main">
-          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5"/></svg></div>
-          <div><div class="biz-name">Reservations</div><div class="biz-desc" style="margin-top:.25rem">Bookings &amp; calendar</div></div>
-        </div>
-        <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">3 tonight</span></div>
-      </div>
-      <div class="biz-card" style="--c:#f97316;--ic-bg:#ffedd5;--ic:#c2410c;cursor:pointer" onclick="goTo('delivery','restaurant')">
-        <div class="biz-stripe"></div>
-        <div class="biz-main">
-          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6"/></svg></div>
-          <div><div class="biz-name">Delivery</div><div class="biz-desc" style="margin-top:.25rem">Riders &amp; dispatches</div></div>
-        </div>
-        <div class="biz-footer"><span class="biz-branches">6 active</span></div>
-      </div>
-      <div class="biz-card" style="--c:#6366f1;--ic-bg:#e0e7ff;--ic:#4338ca;cursor:pointer" onclick="goTo('staff','restaurant')">
-        <div class="biz-stripe"></div>
-        <div class="biz-main">
-          <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg></div>
-          <div><div class="biz-name">Staff</div><div class="biz-desc" style="margin-top:.25rem">Roster &amp; tasks</div></div>
-        </div>
-        <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">5 tasks</span></div>
-      </div>
-    </div>
-
-  </div><!-- /for-branch -->
-
-  <!-- ══════════════ SUPPLIER VIEW ══════════════ -->
-  <div class="for-supplier">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:2rem;text-align:center;color:var(--text-600)">
-      <div style="font-size:2rem;margin-bottom:.5rem">🏭</div>
-      <div style="font-weight:600;font-size:1rem;color:var(--text-900);margin-bottom:.375rem">Supplier View</div>
-      <div style="font-size:.875rem">Supplier Admin sees vendors they supply to, purchase orders, catalogue &amp; invoicing. To be designed in next iteration.</div>
-    </div>
-  </div>
+  </div><!-- /for-superadmin management -->
 
 </main>
 
@@ -826,10 +940,19 @@ function setRole(role, btn) {
   document.querySelector('.ctx-chip').childNodes[2].textContent = ' ' + cfg.ctx + ' ';
   document.getElementById('ctxBadge').textContent = cfg.ctxBadge;
 
-  // supplier needs for-supplier shown
-  if(role === 'supplier') {
-    document.querySelector('.for-supplier').style.display = 'block';
-  }
+  // update apps section label
+  const appsLbl = document.getElementById('appsLabel');
+  if (appsLbl) appsLbl.textContent = appLabelByRole[role] || 'Your apps';
+  // reset launcher tabs to Apps when switching roles
+  const launcherApps = document.getElementById('launcher-apps');
+  const launcherMgmt = document.getElementById('launcher-management');
+  const adminStats = document.getElementById('admin-apps-section');
+  if (launcherApps) launcherApps.style.display = '';
+  if (launcherMgmt) launcherMgmt.style.display = 'none';
+  if (adminStats) adminStats.style.display = '';
+  document.querySelectorAll('.ltab').forEach(t => t.classList.remove('active'));
+  const firstTab = document.querySelector('.ltab');
+  if (firstTab) firstTab.classList.add('active');
 }
 
 /* ─── Impersonation ─── */
@@ -882,10 +1005,34 @@ function openBranch(branchId) {
 }
 
 function drillVendor(vendorId) {
-  // Super admin drills into a vendor — would show that vendor's launcher
-  sessionStorage.setItem('activeVendor', vendorId);
-  alert('In full app: would switch context to ' + vendorId + ' and show their businesses');
+  window.location.href = 'admin/vendor-detail.html';
 }
+
+/* ─── Launcher tab switching (admin only) ─── */
+function switchLauncherTab(tab, btn) {
+  document.querySelectorAll('.ltab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const appsEl = document.getElementById('launcher-apps');
+  const mgmtEl = document.getElementById('launcher-management');
+  const adminStatsEl = document.getElementById('admin-apps-section');
+  if (tab === 'apps') {
+    if (appsEl) appsEl.style.display = 'block';
+    if (mgmtEl) mgmtEl.style.display = 'none';
+    if (adminStatsEl) adminStatsEl.style.display = 'block';
+  } else {
+    if (appsEl) appsEl.style.display = 'none';
+    if (mgmtEl) mgmtEl.style.display = 'block';
+    if (adminStatsEl) adminStatsEl.style.display = 'none';
+  }
+}
+
+/* ─── Role change: update greeting and app label ─── */
+const appLabelByRole = {
+  'vendor-admin': 'Your apps',
+  'superadmin': 'Your apps',
+  'branch-admin': 'Your tools',
+  'supplier': 'Your supply partners',
+};
 </script>
 </body>
 </html>
