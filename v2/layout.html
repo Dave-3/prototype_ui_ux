@@ -226,6 +226,97 @@
     .chip-blue{background:#dbeafe;color:#1d4ed8}
     .chip-red{background:#fee2e2;color:#b91c1c}
     .chip-gray{background:#f3f4f6;color:#374151}
+
+    /* ═══ ROLE TOKENS ═══ */
+    :root{
+      --admin:#DC2626;--admin-bg:#FEF2F2;--admin-border:#FECACA;
+      --supplier:#7c3aed;--supplier-bg:#f5f3ff;--supplier-border:#ddd6fe;
+    }
+
+    /* ─── Super Admin vendor context switcher (global, top of sidebar) ─── */
+    .vendor-ctx-bar{display:none;border-bottom:1px solid var(--border);padding:.625rem .75rem;background:linear-gradient(135deg,#fff8f0,#fffbeb)}
+    body.role-superadmin .vendor-ctx-bar{display:block}
+    .vendor-ctx-label{font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#d97706;margin-bottom:.3rem}
+    .vendor-ctx-select{
+      display:flex;align-items:center;gap:.4375rem;
+      padding:.375rem .5625rem;border-radius:var(--radius-md);
+      background:#fff;border:1.5px solid #fde68a;cursor:pointer;
+      font-family:'Inter',sans-serif;font-size:.8125rem;font-weight:600;color:var(--text-900);
+      width:100%;text-align:left;transition:border-color .15s;
+    }
+    .vendor-ctx-select:hover{border-color:#f59e0b}
+    .vendor-ctx-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:#f59e0b}
+    .vendor-ctx-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .vendor-ctx-chevron{color:var(--text-400);flex-shrink:0}
+    .vendor-ctx-dropdown{
+      background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-md);position:absolute;left:.75rem;right:.75rem;z-index:200;
+      display:none;overflow:hidden;
+    }
+    .vendor-ctx-dropdown.open{display:block}
+    .vendor-ctx-item{
+      display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;
+      font-size:.8125rem;cursor:pointer;transition:background .12s;
+    }
+    .vendor-ctx-item:hover{background:var(--bg)}
+    .vendor-ctx-item.active{background:#fffbeb;color:#92400e;font-weight:600}
+    .vendor-ctx-item .vci-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .vendor-ctx-item .vci-check{margin-left:auto;color:#d97706;visibility:hidden}
+    .vendor-ctx-item.active .vci-check{visibility:visible}
+    /* "All Vendors" special style */
+    .vendor-ctx-item.all-vendors{border-bottom:1px solid var(--border)}
+    .vendor-ctx-item.all-vendors .vci-dot{background:linear-gradient(135deg,#65A694,#0ea5e9,#f97316);border-radius:50%}
+
+    /* Super admin badge in topnav */
+    .sa-badge{display:none;padding:.1875rem .5rem;border-radius:99px;font-size:.6875rem;font-weight:700;background:var(--admin-bg);color:var(--admin);border:1px solid var(--admin-border);white-space:nowrap;flex-shrink:0}
+    body.role-superadmin .sa-badge{display:inline-flex;align-items:center;gap:.25rem}
+
+    /* Subscriptions nav item — super admin only */
+    .nav-item.sa-only{display:none}
+    body.role-superadmin .nav-item.sa-only{display:flex}
+
+    /* ─── SUPPLIER layout ─── */
+    body.role-supplier .ctx-switcher{display:none}
+    /* supplier scope bar replaces vendor ctx at top of sidebar */
+    .supplier-scope-bar{display:none;border-bottom:1px solid var(--border);padding:.625rem .75rem;background:linear-gradient(135deg,var(--supplier-bg),#faf5ff)}
+    body.role-supplier .supplier-scope-bar{display:block}
+    .supplier-scope-label{font-size:.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--supplier);margin-bottom:.3rem}
+    .scope-chip-row{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.25rem}
+    .scope-chip{
+      display:inline-flex;align-items:center;gap:.25rem;padding:.1875rem .5rem;
+      border-radius:99px;font-size:.6875rem;font-weight:600;border:1.5px solid;cursor:pointer;transition:all .15s;white-space:nowrap;
+    }
+    .scope-chip.platform{background:var(--supplier-bg);color:var(--supplier);border-color:var(--supplier-border)}
+    .scope-chip.region{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
+    .scope-chip.vendor{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+    .scope-chip.branch{background:#fef3c7;color:#d97706;border-color:#fde68a}
+    .scope-chip.active{box-shadow:0 0 0 2px currentColor;opacity:1}
+    .scope-chip.inactive{opacity:.55}
+    .scope-drill{font-size:.6875rem;color:var(--text-400);margin-top:.25rem;display:flex;align-items:center;gap:.25rem}
+    .scope-drill-sep{opacity:.5}
+
+    /* supplier module banner */
+    .supplier-module-header{display:none}
+    body.role-supplier .supplier-module-header{display:block}
+    body.role-supplier .module-switcher,
+    body.role-supplier .divider-v.hide-supplier,
+    body.role-supplier .biz-topnav-label{display:none}
+
+    /* insight/alert card */
+    .insight-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.875rem 1rem;display:flex;gap:.75rem;align-items:flex-start}
+    .insight-icon{width:32px;height:32px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .insight-body{flex:1}
+    .insight-title{font-size:.875rem;font-weight:600;margin-bottom:.2rem}
+    .insight-meta{font-size:.75rem;color:var(--text-600)}
+    .insight-action{font-size:.75rem;font-weight:600;color:var(--primary);cursor:pointer;margin-top:.3rem;display:inline-block}
+    .insights-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1rem}
+    @media(max-width:900px){.insights-grid{grid-template-columns:1fr}}
+
+    /* waiter perf table row highlight */
+    .perf-rank{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.6875rem;font-weight:700}
+    .rank-gold{background:#fef3c7;color:#d97706}
+    .rank-silver{background:#f3f4f6;color:#374151}
+    .rank-bronze{background:#ffedd5;color:#c2410c}
   </style>
 </head>
 <body>
@@ -240,9 +331,14 @@
       <span class="brand-name">App<em>In</em>App</span>
     </a>
 
+    <span class="sa-badge">
+      <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      Super Admin
+    </span>
+
     <div class="divider-v"></div>
 
-    <!-- Active business label -->
+    <!-- Active business label (hidden for supplier) -->
     <div class="biz-topnav-label" id="bizTopLabel" onclick="goLauncher()">
       <span class="dot" id="bizDot" style="background:var(--primary)"></span>
       <span id="bizTopName">Kilimani Grill</span>
@@ -258,9 +354,9 @@
 
     <div class="divider-v"></div>
 
-    <button class="launcher-btn" onclick="goLauncher()">
+    <button class="launcher-btn" id="launcherBtn" onclick="goLauncher()">
       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
-      All Businesses
+      All Apps
     </button>
   </div>
 
@@ -284,6 +380,83 @@
 
   <!-- ─── SIDEBAR ─── -->
   <aside class="sidebar" id="sidebar">
+
+    <!-- Super Admin: vendor context switcher bar (role-gated via CSS) -->
+    <div class="vendor-ctx-bar" id="vendorCtxBar" style="position:relative">
+      <div class="vendor-ctx-label">
+        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Global Vendor Context
+      </div>
+      <button class="vendor-ctx-select" id="vendorCtxBtn" onclick="toggleVendorCtx(event)">
+        <span class="vendor-ctx-dot" id="vendorCtxDot"></span>
+        <span class="vendor-ctx-name" id="vendorCtxName">All Vendors</span>
+        <svg class="vendor-ctx-chevron" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="11" height="11"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+      </button>
+      <div class="vendor-ctx-dropdown" id="vendorCtxDrop">
+        <div class="vendor-ctx-item all-vendors active" id="vci-all" onclick="setVendorCtx('all','All Vendors','')">
+          <span class="vci-dot"></span>
+          <div>
+            <div style="font-size:.8125rem;font-weight:600">All Vendors</div>
+            <div style="font-size:.6875rem;color:var(--text-400)">Platform aggregated</div>
+          </div>
+          <svg class="vci-check" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        </div>
+        <div class="vendor-ctx-item" onclick="setVendorCtx('johari','Johari Holdings','#65A694')">
+          <span class="vci-dot" style="background:#65A694"></span>
+          <div>
+            <div style="font-size:.8125rem;font-weight:600">Johari Holdings</div>
+            <div style="font-size:.6875rem;color:var(--text-400)">Restaurant · Car Rental · Logistics</div>
+          </div>
+          <svg class="vci-check" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        </div>
+        <div class="vendor-ctx-item" onclick="setVendorCtx('nairobi-flavours','Nairobi Flavours','#f97316')">
+          <span class="vci-dot" style="background:#f97316"></span>
+          <div>
+            <div style="font-size:.8125rem;font-weight:600">Nairobi Flavours</div>
+            <div style="font-size:.6875rem;color:var(--text-400)">Restaurant</div>
+          </div>
+          <svg class="vci-check" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        </div>
+        <div class="vendor-ctx-item" onclick="setVendorCtx('westgate-motors','Westgate Motors','#0ea5e9')">
+          <span class="vci-dot" style="background:#0ea5e9"></span>
+          <div>
+            <div style="font-size:.8125rem;font-weight:600">Westgate Motors</div>
+            <div style="font-size:.6875rem;color:var(--text-400)">Car Rental</div>
+          </div>
+          <svg class="vci-check" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supplier: scope drill-down bar (role-gated via CSS) -->
+    <div class="supplier-scope-bar" id="supplierScopeBar">
+      <div class="supplier-scope-label">
+        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+        Analytics Scope
+      </div>
+      <div class="scope-chip-row" id="scopeChipRow">
+        <span class="scope-chip platform active" onclick="setScope('platform')">
+          <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3"/></svg>
+          All
+        </span>
+        <span class="scope-chip region inactive" onclick="setScope('region')">
+          <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"/></svg>
+          Region
+        </span>
+        <span class="scope-chip vendor inactive" onclick="setScope('vendor')">
+          <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3 9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75"/></svg>
+          Vendor
+        </span>
+        <span class="scope-chip branch inactive" onclick="setScope('branch')">
+          <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+          Branch
+        </span>
+      </div>
+      <div class="scope-drill" id="scopeDrill">
+        <span style="color:var(--supplier);font-weight:600">All Restaurants · All Regions</span>
+      </div>
+    </div>
+
     <!-- Context switcher (static in HTML, JS enhances) -->
     <div class="ctx-switcher" id="ctxSwitcher">
       <!-- filled by JS -->
@@ -448,6 +621,23 @@ const apps = {
     name:'Payments',label:'Payments',color:'#0ea5e9',iconBg:'#e0f2fe',
     nav:[{label:'Transactions',id:'pc-txn',icon:'list',badge:null},{label:'Invoices',id:'pc-inv',icon:'doc',badge:null}]
   },
+  /* ─── Supplier analytics app ─── */
+  'supplier-analytics':{
+    name:'Analytics',label:'Analytics',color:'#7c3aed',iconBg:'#f5f3ff',
+    nav:[
+      {label:'Overview',id:'sup-overview',icon:'chart',badge:null},
+      {label:'Product Movement',id:'sup-movement',icon:'truck',badge:null},
+      {label:'Sales Velocity',id:'sup-velocity',icon:'bolt',badge:null},
+      {label:'Waiter Performance',id:'sup-waiter',icon:'users',badge:null},
+      {section:'Intelligence'},
+      {label:'Insights & Alerts',id:'sup-insights',icon:'sparkles',badge:'3'},
+      {label:'Low Stock Signals',id:'sup-stock',icon:'warning',badge:'5'},
+      {label:'Coverage Map',id:'sup-coverage',icon:'map',badge:null},
+      {section:'My Products'},
+      {label:'Product Catalogue',id:'sup-products',icon:'tag',badge:null},
+    ]
+  },
+
   /* Logistics modules */
   dispatches:{
     name:'Dispatches',label:'Dispatches',color:'#f97316',iconBg:'#ffedd5',
@@ -478,6 +668,15 @@ let currentBiz = 'restaurant';
 let currentBranch = 'Kilimani Main';
 let currentModule = 'orders';
 let activeNavId = 'live';
+
+// Role state: 'vendor-admin' | 'superadmin' | 'branch-admin' | 'supplier'
+let currentRole = 'vendor-admin';
+// Supplier sub-role: 'admin' | 'regional' | 'branch-rep'
+let supplierSubRole = 'admin';
+// Supplier scope: 'platform' | 'region' | 'vendor' | 'branch'
+let supplierScope = 'platform';
+// Super admin vendor context: 'all' | vendor key
+let saVendorCtx = 'all';
 
 /* ════════════════════════════════════════════
    SVG icon helper
@@ -526,8 +725,11 @@ function icon(name,size=16){
    Build context switcher
 ════════════════════════════════════════════ */
 function buildContextSwitcher(){
-  const biz = businesses[currentBiz];
   const el = document.getElementById('ctxSwitcher');
+  if(!el) return;
+  if(currentRole === 'supplier') { el.innerHTML=''; return; }
+
+  const biz = businesses[currentBiz];
 
   const bizOptionsHtml = Object.entries(businesses).map(([key,b])=>`
     <div class="ctx-dropdown-item ${key===currentBiz?'active':''}" onclick="switchBiz('${key}');event.stopPropagation()">
@@ -595,18 +797,17 @@ function toggleDrop(id){
   }
 }
 
-// Close dropdowns on outside click
-document.addEventListener('click', ()=>{
-  document.querySelectorAll('.ctx-dropdown').forEach(d=>d.classList.remove('open'));
-  document.querySelectorAll('.ctx-select-btn').forEach(b=>b.classList.remove('open'));
-});
-
 /* ════════════════════════════════════════════
    Build module pills in topnav
 ════════════════════════════════════════════ */
 function buildModulePills(){
-  const biz = businesses[currentBiz];
   const sw = document.getElementById('moduleSwitcher');
+  if(currentRole === 'supplier'){
+    // Supplier: no module switcher pills — single analytics app
+    sw.innerHTML = `<span style="font-size:.8125rem;font-weight:600;color:var(--supplier);padding:.25rem .625rem;background:var(--supplier-bg);border-radius:99px;border:1px solid var(--supplier-border)">Analytics Portal</span>`;
+    return;
+  }
+  const biz = businesses[currentBiz];
   sw.innerHTML = biz.modules.map(m=>{
     const app = apps[m];
     if(!app) return '';
@@ -623,28 +824,43 @@ function buildSidebarNav(){
   const app = apps[currentModule];
   if(!app) return;
   const el = document.getElementById('sidebarNav');
-  const biz = businesses[currentBiz];
+  const biz = businesses[currentBiz] || {};
+
+  const iconKey =
+    currentModule==='orders'?'clipboard':
+    currentModule==='menu'?'tag':
+    currentModule==='staff'?'users':
+    (currentModule==='payments'||currentModule==='payments-car'||currentModule==='payments-log')?'card':
+    currentModule==='delivery'?'truck':
+    (currentModule==='customers'||currentModule==='customers-car')?'users':
+    currentModule==='reservations'?'calendar':
+    currentModule==='bookings'?'calendar':
+    currentModule==='fleet'?'car':
+    currentModule==='dispatches'?'bolt':
+    currentModule==='riders'?'users':
+    currentModule==='tracking'?'map':
+    currentModule==='supplier-analytics'?'chart':
+    'chart';
 
   let html = `
     <div class="sidebar-header">
-      <div class="sidebar-app-icon" style="background:${app.color}">${icon(
-        currentModule==='orders'?'clipboard':
-        currentModule==='menu'?'tag':
-        currentModule==='staff'?'users':
-        currentModule==='payments'||currentModule==='payments-car'||currentModule==='payments-log'?'card':
-        currentModule==='delivery'?'truck':
-        currentModule==='customers'||currentModule==='customers-car'?'users':
-        currentModule==='reservations'?'calendar':
-        currentModule==='bookings'?'calendar':
-        currentModule==='fleet'?'car':
-        currentModule==='dispatches'?'bolt':
-        currentModule==='riders'?'users':
-        currentModule==='tracking'?'map':
-        'chart', 14)}</div>
+      <div class="sidebar-app-icon" style="background:${app.color}">${icon(iconKey, 14)}</div>
       <div class="sidebar-app-name">${app.name}</div>
     </div>
     <div class="sidebar-divider"></div>
   `;
+
+  // For super admin: inject "Subscribed Vendors" item at top of nav
+  if(currentRole === 'superadmin'){
+    html += `
+      <div class="nav-item sa-only active" onclick="setActive('sa-subscriptions')" style="${activeNavId==='sa-subscriptions'?'':''}">
+        <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+        Subscribed Vendors
+        <span class="nav-badge" style="background:var(--primary)">14</span>
+      </div>
+      <div class="sidebar-divider"></div>
+    `;
+  }
 
   app.nav.forEach(item=>{
     if(item.section){
@@ -668,10 +884,11 @@ function buildSidebarNav(){
     }
   });
 
+  const allAppsLabel = currentRole === 'supplier' ? 'All Apps' : 'All Businesses';
   html+=`<div class="sidebar-footer">
     <a href="launcher.html" class="sidebar-footer-item">
       <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="15" height="15"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
-      All Businesses
+      ${allAppsLabel}
     </a>
     <div class="sidebar-footer-item">
       <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" width="15" height="15"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -690,7 +907,7 @@ function buildSidebarNav(){
 ════════════════════════════════════════════ */
 function buildContent(){
   const app = apps[currentModule];
-  const biz = businesses[currentBiz];
+  const biz = businesses[currentBiz] || {};
   let pageLabel = 'Dashboard';
   app.nav.forEach(n=>{
     if(n.id===activeNavId) pageLabel=n.label;
@@ -698,14 +915,31 @@ function buildContent(){
   });
 
   const mc = document.getElementById('mainContent');
+
+  // ── Supplier content ──
+  if(currentRole === 'supplier'){
+    mc.innerHTML = buildSupplierContent(activeNavId, pageLabel);
+    return;
+  }
+
+  // ── Super admin context banner ──
+  const saBanner = currentRole === 'superadmin' ? `
+    <div style="background:linear-gradient(90deg,#fffbeb,#fff8f0);border-bottom:1px solid #fde68a;padding:.5rem 1.5rem;display:flex;align-items:center;gap:.625rem;font-size:.8125rem;flex-shrink:0">
+      <svg fill="none" stroke="#d97706" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <span style="color:#92400e;font-weight:600">Viewing:</span>
+      <span style="color:#78350f" id="saContextLabel">${saVendorCtx === 'all' ? 'All Vendors — Platform Aggregated' : saVendorCtx}</span>
+      ${saVendorCtx !== 'all' ? `<span style="color:#d97706;font-size:.6875rem;margin-left:.25rem">· Scoped to this vendor</span>` : ''}
+    </div>` : '';
+
   mc.innerHTML=`
+    ${saBanner}
     <div class="page-header">
       <div>
         <div class="page-title">${pageLabel}</div>
         <div class="page-breadcrumb">
-          <span>Johari Holdings</span>
-          <span class="bc-sep">›</span>
-          <span>${biz.name}</span>
+          ${currentRole === 'superadmin'
+            ? `<span style="color:var(--admin);font-weight:600">AppInApp</span><span class="bc-sep">›</span><span>${biz.name||'—'}</span>`
+            : `<span>Johari Holdings</span><span class="bc-sep">›</span><span>${biz.name||'—'}</span>`}
           <span class="bc-sep">›</span>
           <span>${currentBranch}</span>
           <span class="bc-sep">›</span>
@@ -733,15 +967,20 @@ function buildContent(){
     </div>
 
     <div class="content-inner">
+      ${currentRole === 'superadmin' ? `
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius-md);padding:.5rem .875rem;margin-bottom:.875rem;font-size:.8125rem;color:#92400e;display:flex;align-items:center;gap:.5rem">
+        <svg fill="none" stroke="#d97706" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+        ${saVendorCtx === 'all' ? 'Platform-wide data · All vendors combined' : `Showing data for <strong style="margin-left:.25rem">${saVendorCtx}</strong> only`}
+      </div>` : ''}
       <div class="stats-row">
         <div class="stat-card">
           <div class="stat-top"><div class="stat-label">Total Revenue</div><div class="stat-icon-wrap" style="background:#E6F0EE;color:var(--primary)">${icon('currency',14)}</div></div>
-          <div class="stat-value">KES 84,320</div>
+          <div class="stat-value">${currentRole==='superadmin'&&saVendorCtx==='all'?'KES 2.4M':'KES 84,320'}</div>
           <div class="stat-sub"><span class="up">↑ 12%</span> vs yesterday</div>
         </div>
         <div class="stat-card">
           <div class="stat-top"><div class="stat-label">Volume</div><div class="stat-icon-wrap" style="background:#E6F0EE;color:var(--primary)">${icon('list',14)}</div></div>
-          <div class="stat-value">147</div>
+          <div class="stat-value">${currentRole==='superadmin'&&saVendorCtx==='all'?'3,847':'147'}</div>
           <div class="stat-sub"><span class="up">↑ 8</span> this hour</div>
         </div>
         <div class="stat-card">
@@ -750,15 +989,15 @@ function buildContent(){
           <div class="stat-sub"><span class="up">↑ 4%</span> this week</div>
         </div>
         <div class="stat-card">
-          <div class="stat-top"><div class="stat-label">Issues</div><div class="stat-icon-wrap" style="background:#fee2e2;color:#b91c1c">${icon('warning',14)}</div></div>
-          <div class="stat-value">4</div>
-          <div class="stat-sub"><span class="down">↑ 2</span> vs yesterday</div>
+          <div class="stat-top"><div class="stat-label">${currentRole==='superadmin'?'Active Vendors':'Issues'}</div><div class="stat-icon-wrap" style="background:#fee2e2;color:#b91c1c">${icon('warning',14)}</div></div>
+          <div class="stat-value">${currentRole==='superadmin'&&saVendorCtx==='all'?'14':'4'}</div>
+          <div class="stat-sub">${currentRole==='superadmin'&&saVendorCtx==='all'?'<span class="up">↑ 2</span> this month':'<span class="down">↑ 2</span> vs yesterday'}</div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Recent — ${currentBranch}</div>
+          <div class="card-title">Recent — ${currentRole==='superadmin'&&saVendorCtx==='all'?'All Vendors':currentBranch}</div>
           <button class="btn btn-secondary" style="font-size:.8125rem;padding:.3125rem .625rem">View All</button>
         </div>
         <div class="table-wrap">
@@ -779,6 +1018,176 @@ function buildContent(){
       </div>
     </div>
   `;
+}
+
+/* ════════════════════════════════════════════
+   Supplier content rendering
+════════════════════════════════════════════ */
+function buildSupplierContent(navId, pageLabel){
+  const scopeLabel = {
+    platform: 'All Restaurants · All Regions',
+    region: 'Nairobi Region',
+    vendor: 'Johari Holdings',
+    branch: 'Kilimani Main'
+  }[supplierScope] || 'All Restaurants';
+
+  if(navId === 'sup-waiter'){
+    return `
+      <div class="page-header">
+        <div>
+          <div class="page-title">Waiter Performance</div>
+          <div class="page-breadcrumb"><span style="color:var(--supplier);font-weight:600">EABL Supply Co.</span><span class="bc-sep">›</span><span>Analytics</span><span class="bc-sep">›</span><span style="color:var(--text-900)">Waiter Performance</span></div>
+        </div>
+        <div class="page-actions">
+          <div style="font-size:.75rem;color:var(--text-600);padding:.375rem .625rem;background:var(--supplier-bg);border:1px solid var(--supplier-border);border-radius:var(--radius-md)">${scopeLabel}</div>
+          <button class="btn btn-secondary" style="font-size:.8125rem;padding:.375rem .75rem">Export</button>
+        </div>
+      </div>
+      <div class="content-inner">
+        <div style="background:var(--supplier-bg);border:1px solid var(--supplier-border);border-radius:var(--radius-md);padding:.625rem 1rem;margin-bottom:1rem;font-size:.8125rem;color:#5b21b6;display:flex;align-items:center;gap:.5rem">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+          Orders containing your products only · Use this to incentivise top performers
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-top"><div class="stat-label">Total Product Orders</div><div class="stat-icon-wrap" style="background:var(--supplier-bg);color:var(--supplier)">${icon('list',14)}</div></div><div class="stat-value">1,284</div><div class="stat-sub"><span class="up">↑ 18%</span> this month</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-label">Active Waiters</div><div class="stat-icon-wrap" style="background:var(--supplier-bg);color:var(--supplier)">${icon('users',14)}</div></div><div class="stat-value">47</div><div class="stat-sub">Across ${scopeLabel}</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-label">Top Product</div><div class="stat-icon-wrap" style="background:#fef3c7;color:#d97706">${icon('star',14)}</div></div><div class="stat-value" style="font-size:1rem">Tusker Lager</div><div class="stat-sub">342 orders this month</div></div>
+          <div class="stat-card"><div class="stat-top"><div class="stat-label">Avg per Waiter</div><div class="stat-icon-wrap" style="background:#d1fae5;color:#047857">${icon('chart',14)}</div></div><div class="stat-value">27.3</div><div class="stat-sub">Orders / waiter / month</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Waiter Leaderboard — Your Products</div>
+            <div style="font-size:.75rem;color:var(--text-600)">March 2026</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Rank</th><th>Waiter</th><th>Branch</th><th>Vendor</th><th>Orders (Your Products)</th><th>Top Product</th><th>Trend</th></tr></thead>
+              <tbody>
+                <tr><td><span class="perf-rank rank-gold">1</span></td><td><strong>James Otieno</strong></td><td>Kilimani Main</td><td>Johari Holdings</td><td>89</td><td>Tusker Lager</td><td><span class="up">↑ 12%</span></td></tr>
+                <tr><td><span class="perf-rank rank-silver">2</span></td><td>Grace Wanjiru</td><td>Westlands</td><td>Johari Holdings</td><td>74</td><td>Guinness Stout</td><td><span class="up">↑ 8%</span></td></tr>
+                <tr><td><span class="perf-rank rank-bronze">3</span></td><td>Kevin Mwangi</td><td>Nairobi CBD</td><td>Nairobi Flavours</td><td>68</td><td>Tusker Malt</td><td><span class="up">↑ 5%</span></td></tr>
+                <tr><td><span class="perf-rank" style="background:#f3f4f6;color:#374151">4</span></td><td>Aisha Hassan</td><td>Karen</td><td>Johari Holdings</td><td>52</td><td>Serengeti Premium</td><td><span class="down">↓ 3%</span></td></tr>
+                <tr><td><span class="perf-rank" style="background:#f3f4f6;color:#374151">5</span></td><td>David Kamau</td><td>Westlands</td><td>Nairobi Flavours</td><td>49</td><td>Tusker Lager</td><td><span class="up">↑ 2%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  if(navId === 'sup-insights' || navId === 'sup-stock'){
+    return `
+      <div class="page-header">
+        <div>
+          <div class="page-title">${pageLabel}</div>
+          <div class="page-breadcrumb"><span style="color:var(--supplier);font-weight:600">EABL Supply Co.</span><span class="bc-sep">›</span><span>Intelligence</span><span class="bc-sep">›</span><span style="color:var(--text-900)">${pageLabel}</span></div>
+        </div>
+        <div class="page-actions">
+          <div style="font-size:.75rem;color:var(--text-600);padding:.375rem .625rem;background:var(--supplier-bg);border:1px solid var(--supplier-border);border-radius:var(--radius-md)">${scopeLabel}</div>
+        </div>
+      </div>
+      <div class="content-inner">
+        <div class="insights-grid">
+          <div class="insight-card">
+            <div class="insight-icon" style="background:#fee2e2">
+              <svg fill="none" stroke="#dc2626" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <div class="insight-body">
+              <div class="insight-title">Low Stock Signal — Kilimani Main</div>
+              <div class="insight-meta">Tusker Lager · Estimated 2 days remaining based on sales velocity</div>
+              <span class="insight-action">Flag for reorder →</span>
+            </div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon" style="background:#fef3c7">
+              <svg fill="none" stroke="#d97706" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
+            </div>
+            <div class="insight-body">
+              <div class="insight-title">Velocity Spike — Westlands</div>
+              <div class="insight-meta">Guinness Stout · Sales up 34% this week vs prior 4-week avg</div>
+              <span class="insight-action">View trend →</span>
+            </div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon" style="background:#d1fae5">
+              <svg fill="none" stroke="#047857" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+            </div>
+            <div class="insight-body">
+              <div class="insight-title">New Venue Opportunity</div>
+              <div class="insight-meta">Karen branch — high traffic, no EABL products listed. Recommend onboarding.</div>
+              <span class="insight-action">Suggest to vendor →</span>
+            </div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon" style="background:var(--supplier-bg)">
+              <svg fill="none" stroke="var(--supplier)" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3 9.35m0 0a3.001 3.001 0 003.75-.615"/></svg>
+            </div>
+            <div class="insight-body">
+              <div class="insight-title">Weekend Peak Forecast</div>
+              <div class="insight-meta">Tusker Lager demand expected +28% Fri–Sun across Nairobi Region</div>
+              <span class="insight-action">View forecast →</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Low Stock Monitor</div><span class="chip chip-red" style="font-size:.6875rem">5 alerts</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Product</th><th>Branch</th><th>Vendor</th><th>Est. Days Left</th><th>Velocity (7d avg)</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Tusker Lager 500ml</strong></td><td>Kilimani Main</td><td>Johari Holdings</td><td style="color:#dc2626;font-weight:600">2 days</td><td>48 units/day</td><td><span class="chip chip-red">Critical</span></td></tr>
+                <tr><td><strong>Guinness Stout 330ml</strong></td><td>Westlands</td><td>Johari Holdings</td><td style="color:#d97706;font-weight:600">5 days</td><td>22 units/day</td><td><span class="chip chip-yellow">Warning</span></td></tr>
+                <tr><td><strong>Tusker Malt 500ml</strong></td><td>CBD Branch</td><td>Nairobi Flavours</td><td style="color:#d97706;font-weight:600">6 days</td><td>18 units/day</td><td><span class="chip chip-yellow">Warning</span></td></tr>
+                <tr><td><strong>Serengeti Premium</strong></td><td>Karen</td><td>Johari Holdings</td><td style="color:#047857;font-weight:600">12 days</td><td>11 units/day</td><td><span class="chip chip-green">OK</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Default supplier content (Overview / Product Movement / etc.)
+  return `
+    <div class="page-header">
+      <div>
+        <div class="page-title">${pageLabel}</div>
+        <div class="page-breadcrumb"><span style="color:var(--supplier);font-weight:600">EABL Supply Co.</span><span class="bc-sep">›</span><span>Analytics</span><span class="bc-sep">›</span><span style="color:var(--text-900)">${pageLabel}</span></div>
+      </div>
+      <div class="page-actions">
+        <div style="font-size:.75rem;color:var(--text-600);padding:.375rem .625rem;background:var(--supplier-bg);border:1px solid var(--supplier-border);border-radius:var(--radius-md)">${scopeLabel}</div>
+        <button class="btn btn-secondary" style="font-size:.8125rem;padding:.375rem .75rem">Export</button>
+      </div>
+    </div>
+    <div class="content-inner">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-top"><div class="stat-label">Units Sold (Month)</div><div class="stat-icon-wrap" style="background:var(--supplier-bg);color:var(--supplier)">${icon('chart',14)}</div></div><div class="stat-value">18,420</div><div class="stat-sub"><span class="up">↑ 11%</span> vs last month</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-label">Active Venues</div><div class="stat-icon-wrap" style="background:var(--supplier-bg);color:var(--supplier)">${icon('location',14)}</div></div><div class="stat-value">23</div><div class="stat-sub">Across ${scopeLabel}</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-label">Top SKU</div><div class="stat-icon-wrap" style="background:#fef3c7;color:#d97706">${icon('star',14)}</div></div><div class="stat-value" style="font-size:1rem">Tusker Lager</div><div class="stat-sub">6,200 units this month</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-label">Alerts</div><div class="stat-icon-wrap" style="background:#fee2e2;color:#b91c1c">${icon('warning',14)}</div></div><div class="stat-value">5</div><div class="stat-sub"><span class="down">2 critical</span> low stock</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Product Movement — ${scopeLabel}</div>
+          <div style="display:flex;gap:.375rem">
+            <button class="btn btn-secondary" style="font-size:.75rem;padding:.25rem .5rem">7 days</button>
+            <button class="btn btn-primary" style="font-size:.75rem;padding:.25rem .5rem">30 days</button>
+            <button class="btn btn-secondary" style="font-size:.75rem;padding:.25rem .5rem">90 days</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Product (SKU)</th><th>Units Sold</th><th>Top Branch</th><th>Trend (30d)</th><th>Avg Daily</th><th>Est. Stock Days</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Tusker Lager 500ml</strong></td><td>6,200</td><td>Kilimani Main</td><td><span class="up">↑ 14%</span></td><td>207</td><td><span style="color:#dc2626;font-weight:600">2d ⚠</span></td></tr>
+              <tr><td><strong>Guinness Stout 330ml</strong></td><td>3,840</td><td>Westlands</td><td><span class="up">↑ 34%</span></td><td>128</td><td><span style="color:#d97706;font-weight:600">5d</span></td></tr>
+              <tr><td><strong>Tusker Malt 500ml</strong></td><td>2,910</td><td>CBD Branch</td><td><span class="down">↓ 4%</span></td><td>97</td><td>12d</td></tr>
+              <tr><td><strong>Serengeti Premium 500ml</strong></td><td>2,580</td><td>Karen</td><td><span class="up">↑ 8%</span></td><td>86</td><td>18d</td></tr>
+              <tr><td><strong>Balozi Lager 500ml</strong></td><td>1,890</td><td>Westlands</td><td><span class="up">↑ 2%</span></td><td>63</td><td>24d</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
 }
 
 /* ════════════════════════════════════════════
@@ -824,23 +1233,90 @@ function goLauncher(){
   window.location.href='launcher.html';
 }
 
+/* ─── Super Admin vendor context switcher ─── */
+function toggleVendorCtx(e){
+  e.stopPropagation();
+  const drop = document.getElementById('vendorCtxDrop');
+  drop.classList.toggle('open');
+}
+
+function setVendorCtx(key, name, color){
+  saVendorCtx = key === 'all' ? 'all' : name;
+  // Update button display
+  const dotEl = document.getElementById('vendorCtxDot');
+  const nameEl = document.getElementById('vendorCtxName');
+  if(dotEl) dotEl.style.background = color || 'linear-gradient(135deg,#65A694,#0ea5e9)';
+  if(nameEl) nameEl.textContent = name;
+  // Mark active in dropdown
+  document.querySelectorAll('.vendor-ctx-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  // Close dropdown
+  document.getElementById('vendorCtxDrop').classList.remove('open');
+  buildContent();
+}
+
+document.addEventListener('click', ()=>{
+  const d = document.getElementById('vendorCtxDrop');
+  if(d) d.classList.remove('open');
+  document.querySelectorAll('.ctx-dropdown').forEach(d=>d.classList.remove('open'));
+  document.querySelectorAll('.ctx-select-btn').forEach(b=>b.classList.remove('open'));
+});
+
+/* ─── Supplier scope drill-down ─── */
+function setScope(scope){
+  supplierScope = scope;
+  document.querySelectorAll('.scope-chip').forEach(c=>{
+    c.classList.remove('active');
+    c.classList.add('inactive');
+  });
+  event.currentTarget.classList.remove('inactive');
+  event.currentTarget.classList.add('active');
+
+  const labels = {
+    platform: 'All Restaurants · All Regions',
+    region: 'Nairobi Region · All Vendors',
+    vendor: 'Johari Holdings · All Branches',
+    branch: 'Kilimani Main (Johari Holdings)'
+  };
+  const drill = document.getElementById('scopeDrill');
+  if(drill) drill.innerHTML = `<span style="color:var(--supplier);font-weight:600">${labels[scope]||''}</span>`;
+  buildContent();
+}
+
 /* ════════════════════════════════════════════
    Init from sessionStorage or defaults
 ════════════════════════════════════════════ */
 const storedMod = sessionStorage.getItem('activeApp');
 const storedBiz = sessionStorage.getItem('activeBiz');
 const storedBranch = sessionStorage.getItem('activeBranch');
-if(storedBiz && businesses[storedBiz]) {
-  currentBiz=storedBiz;
-  currentBranch=businesses[storedBiz].branches[0];
+const storedRole = sessionStorage.getItem('role');
+
+// Apply role
+if(storedRole){
+  currentRole = storedRole === 'superadmin' ? 'superadmin'
+    : storedRole === 'supplier' ? 'supplier'
+    : storedRole === 'branch-admin' ? 'branch-admin'
+    : 'vendor-admin';
 }
-if(storedBranch) currentBranch=storedBranch;
-if(storedMod && apps[storedMod]) {
-  currentModule=storedMod;
-  activeNavId=apps[storedMod].nav.find(n=>n.id)?.id||'dashboard';
+document.body.className = 'role-' + currentRole;
+
+if(currentRole === 'supplier'){
+  // Supplier gets the analytics app
+  currentModule = 'supplier-analytics';
+  activeNavId = 'sup-overview';
 } else {
-  currentModule=businesses[currentBiz].modules[0];
-  activeNavId=apps[currentModule]?.nav?.find(n=>n.id)?.id||'dashboard';
+  if(storedBiz && businesses[storedBiz]) {
+    currentBiz=storedBiz;
+    currentBranch=businesses[storedBiz].branches[0];
+  }
+  if(storedBranch) currentBranch=storedBranch;
+  if(storedMod && apps[storedMod]) {
+    currentModule=storedMod;
+    activeNavId=apps[storedMod].nav.find(n=>n.id)?.id||'dashboard';
+  } else {
+    currentModule=businesses[currentBiz].modules[0];
+    activeNavId=apps[currentModule]?.nav?.find(n=>n.id)?.id||'dashboard';
+  }
 }
 
 buildContextSwitcher();

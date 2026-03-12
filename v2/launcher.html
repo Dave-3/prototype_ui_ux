@@ -417,12 +417,12 @@
 
   <!-- ══════════════ SUPPLIER VIEW — stats ══════════════ -->
   <div class="for-supplier">
-    <div class="sh"><span class="sh-title">Your supply activity</span><span class="sh-sub">Across all partner vendors</span></div>
+    <div class="sh"><span class="sh-title">Analytics overview</span><span class="sh-sub">Your products · All onboarded restaurants</span></div>
     <div class="stats-grid" style="margin-bottom:2.5rem">
-      <div class="stat"><div class="stat-label">Open POs</div><div class="stat-val">14</div><div class="stat-delta neu">3 pending confirmation</div></div>
-      <div class="stat"><div class="stat-label">Deliveries Today</div><div class="stat-val">6</div><div class="stat-delta up">↑ 2 vs tomorrow forecast</div></div>
-      <div class="stat"><div class="stat-label">Revenue (30d)</div><div class="stat-val">KES 284K</div><div class="stat-delta up">↑ 11%</div></div>
-      <div class="stat"><div class="stat-label">Partner Vendors</div><div class="stat-val">8</div><div class="stat-delta neu">2 locations pending</div></div>
+      <div class="stat"><div class="stat-label">Units Sold (Month)</div><div class="stat-val">18,420</div><div class="stat-delta up">↑ 11% vs last month</div></div>
+      <div class="stat"><div class="stat-label">Active Venues</div><div class="stat-val">23</div><div class="stat-delta neu">Across 3 vendors</div></div>
+      <div class="stat"><div class="stat-label">Low Stock Alerts</div><div class="stat-val">5</div><div class="stat-delta down">2 critical</div></div>
+      <div class="stat"><div class="stat-label">Top Product</div><div class="stat-val" style="font-size:1.1rem">Tusker Lager</div><div class="stat-delta neu">6,200 units</div></div>
     </div>
   </div>
 
@@ -685,51 +685,25 @@
         <div class="biz-footer"><span class="biz-branches" style="color:#E8503D;font-weight:600">5 tasks</span></div>
       </div>
 
-      <!-- Supplier app cards (supplier sees their supply partner businesses) -->
-      <div class="ac-supplier biz-card" style="--c:#7C3AED;--ic-bg:#F5F3FF;--ic:#5B21B6" onclick="">
+      <!-- Supplier app cards — analytics apps per onboarded restaurant app -->
+      <div class="ac-supplier biz-card" style="--c:#7C3AED;--ic-bg:#F5F3FF;--ic:#5B21B6" onclick="openSupplierApp('restaurant-app')">
         <div class="biz-stripe"></div>
         <div class="biz-main">
           <div class="biz-top">
-            <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25v14.25"/></svg></div>
-            <span class="supply-badge">Restaurant</span>
+            <div class="biz-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+            </div>
+            <span class="biz-badge" style="background:#7C3AED">5 alerts</span>
           </div>
           <div>
-            <div class="biz-type" style="color:#7C3AED">Supply Partner</div>
-            <div class="biz-name">Kilimani Grill</div>
-            <div class="supply-products"><span class="supply-product-pill">Tusker Lager</span><span class="supply-product-pill">Pilsner Urquell</span><span class="supply-product-pill">White Cap</span></div>
+            <div class="biz-type" style="color:#7C3AED">Analytics · Restaurant App</div>
+            <div class="biz-name">Restaurants by AppInApp</div>
+            <div class="supply-products"><span class="supply-product-pill">Tusker Lager</span><span class="supply-product-pill">Guinness</span><span class="supply-product-pill">Tusker Malt</span><span class="supply-product-pill">Serengeti</span></div>
           </div>
         </div>
-        <div class="biz-footer"><span class="biz-branches">3 open POs · KES 84K pending</span></div>
-      </div>
-      <div class="ac-supplier biz-card" style="--c:#7C3AED;--ic-bg:#F5F3FF;--ic:#5B21B6" onclick="">
-        <div class="biz-stripe"></div>
-        <div class="biz-main">
-          <div class="biz-top">
-            <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25v14.25"/></svg></div>
-            <span class="supply-badge">Restaurant</span>
-          </div>
-          <div>
-            <div class="biz-type" style="color:#7C3AED">Supply Partner</div>
-            <div class="biz-name">Nairobi Flavours</div>
-            <div class="supply-products"><span class="supply-product-pill">Tusker Lager</span><span class="supply-product-pill">Guinness</span></div>
-          </div>
+        <div class="biz-footer"><span class="biz-branches">23 venues · 18,420 units/month</span>
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
         </div>
-        <div class="biz-footer"><span class="biz-branches">1 open PO · KES 34K pending</span></div>
-      </div>
-      <div class="ac-supplier biz-card" style="--c:#0ea5e9;--ic-bg:#e0f2fe;--ic:#0369a1" onclick="">
-        <div class="biz-stripe"></div>
-        <div class="biz-main">
-          <div class="biz-top">
-            <div class="biz-icon"><svg fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18"/></svg></div>
-            <span class="supply-badge">Hotel</span>
-          </div>
-          <div>
-            <div class="biz-type" style="color:#0ea5e9">Supply Partner</div>
-            <div class="biz-name">Prestige Hotels Bar</div>
-            <div class="supply-products"><span class="supply-product-pill">Heineken</span><span class="supply-product-pill">Tusker Malt</span><span class="supply-product-pill">Red Bull</span></div>
-          </div>
-        </div>
-        <div class="biz-footer"><span class="biz-branches">Confirmed for Fri · KES 62K</span></div>
       </div>
 
     </div><!-- /biz-grid -->
@@ -925,7 +899,7 @@ const roleConfig = {
   'vendor-admin':  { label:'Vendor Admin',  cls:'role-vendoradmin',  greeting:'Good morning, James 👋', sub:'Managing <strong>Johari Holdings</strong> · 3 businesses · 7 branches across Nairobi', ctx:'Johari Holdings', ctxBadge:'Vendor' },
   'superadmin':    { label:'Super Admin',   cls:'role-superadmin',   greeting:'Good morning, James 👋', sub:'AppInApp platform · <strong>128 active vendors</strong> · KES 4.2M revenue MTD', ctx:'AppInApp Platform', ctxBadge:'Super Admin' },
   'branch-admin':  { label:'Branch Admin',  cls:'role-branchadmin',  greeting:'Good morning, Sarah 👋', sub:'Managing <strong>Kilimani Main Branch</strong> · Kilimani Grill · Johari Holdings', ctx:'Kilimani Main', ctxBadge:'Branch' },
-  'supplier':      { label:'Supplier',      cls:'role-supplier',     greeting:'Good morning, Ahmed 👋', sub:'Supplier account · <strong>FreshFarm Supplies</strong> · 3 vendor partners', ctx:'FreshFarm Supplies', ctxBadge:'Supplier' },
+  'supplier':      { label:'Supplier',      cls:'role-supplier',     greeting:'Good morning, Ahmed 👋', sub:'Supplier Analytics · <strong>EABL Supply Co.</strong> · 23 venues &middot; 18,420 units/month', ctx:'EABL Supply Co.', ctxBadge:'Supplier Admin' },
 };
 
 function setRole(role, btn) {
@@ -1001,6 +975,12 @@ function goTo(module, biz) {
 function openBranch(branchId) {
   sessionStorage.setItem('activeBranch', branchId);
   sessionStorage.setItem('activeApp', 'orders');
+  window.location.href = 'layout.html';
+}
+
+function openSupplierApp(appKey) {
+  sessionStorage.setItem('role', 'supplier');
+  sessionStorage.setItem('activeApp', 'supplier-analytics');
   window.location.href = 'layout.html';
 }
 
